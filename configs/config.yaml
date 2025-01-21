@@ -1,0 +1,5 @@
+server:
+  http:
+    debug: false
+    addr: 0.0.0.0:80
+    shutdown_timeout: 1m

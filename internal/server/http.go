@@ -4,22 +4,36 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"html/template"
+	"io/fs"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lantonster/askme/internal/conf"
+	"github.com/lantonster/askme/internal/router"
 	"github.com/lantonster/askme/pkg/utils"
+	"github.com/lantonster/askme/ui"
 )
 
 func NewHttpServer(
 	config *conf.Config,
+	uiRouter *router.UiRouter,
 ) *Server {
 	// 设置 gin 的运行模式
 	gin.SetMode(utils.Ternary(config.Server.Http.Debug, gin.DebugMode, gin.ReleaseMode))
 
 	r := gin.New()
+	r.GET("/ping", func(c *gin.Context) { c.String(http.StatusOK, "pong") })
+
+	// 注册 html 模板
+	html, _ := fs.Sub(ui.Template, "template")
+	htmlTemplate := template.Must(template.New("").Funcs(funcMap).ParseFS(html, "*"))
+	r.SetHTMLTemplate(htmlTemplate)
+
+	// 注册 UI 路由
+	uiRouter.Register(r, config)
 
 	return &Server{
 		ShutdownTimeout: config.Server.Http.ShutdownTimeout,
@@ -35,7 +49,7 @@ type Server struct {
 	ShutdownTimeout time.Duration // 关闭超时时间
 }
 
-func (s *Server) Run(ctx context.Context) error {
+func (s *Server) Run(c context.Context) error {
 	if s.srv == nil {
 		return nil
 	}
@@ -61,15 +75,15 @@ func (s *Server) Run(ctx context.Context) error {
 	case <-quit:
 		return s.Stop()
 
-	// 等待 ctx 关闭
-	case <-ctx.Done():
+	// 等待 c 关闭
+	case <-c.Done():
 		return s.Stop()
 	}
 }
 
 func (s *Server) Stop() error {
 	fmt.Println("http server stop")
-	ctx, cancel := context.WithTimeout(context.Background(), s.ShutdownTimeout)
+	c, cancel := context.WithTimeout(context.Background(), s.ShutdownTimeout)
 	defer cancel()
-	return s.srv.Shutdown(ctx)
+	return s.srv.Shutdown(c)
 }

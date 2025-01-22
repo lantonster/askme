@@ -3,3 +3,5 @@ server:
     debug: false
     addr: 0.0.0.0:80
     shutdown_timeout: 1m
+ui:
+  base_url: ""

@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lantonster/askme/internal/conf"
+	"github.com/lantonster/askme/pkg/log"
 	"github.com/lantonster/askme/ui"
 )
 
@@ -83,7 +84,7 @@ func (r *UiRouter) Register(engine *gin.Engine) {
 
 		file, err := ui.Build.ReadFile(filePath)
 		if err != nil {
-			fmt.Println("read file error", err)
+			log.WithContext(c).Errorf("读取文件 %s 失败: %v", filePath, err)
 			c.Status(http.StatusNotFound)
 			return
 		}

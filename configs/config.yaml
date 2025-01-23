@@ -7,3 +7,10 @@ ui:
   base_url: ""
 uploads:
   path: .data/uploads
+logger:
+  level: -1
+  file_name: .askme.log
+  max_age: 3
+  max_size: 100
+  max_backups: 10
+  compress: true

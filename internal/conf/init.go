@@ -1,10 +1,12 @@
 package conf
 
 import (
+	"context"
 	"strings"
 
 	"github.com/google/wire"
 	"github.com/lantonster/askme/configs"
+	"github.com/lantonster/askme/pkg/log"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
 )
@@ -29,6 +31,8 @@ func NewConfig() *Config {
 		panic(err)
 	}
 
+	log.SetLogger(config.Logger) // 初始化日志
+	log.WithContext(context.Background()).Info("config init success")
 	return config
 }
 

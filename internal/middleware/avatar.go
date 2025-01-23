@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lantonster/askme/internal/conf"
 	"github.com/lantonster/askme/internal/service/uploads"
+	"github.com/lantonster/askme/pkg/log"
 	"github.com/spf13/cast"
 )
 
@@ -31,7 +32,7 @@ func (a *AvatarMiddleware) AvatarThumb(c *gin.Context) {
 	uri := c.Request.RequestURI
 	uriWithoutQuery, err := url.Parse(uri)
 	if err != nil {
-		fmt.Println("解析 URL 失败", err)
+		log.WithContext(c).Errorf("解析请求地址 uri %s 失败 %v", uri, err)
 		c.Next()
 		return
 	}
@@ -48,7 +49,7 @@ func (a *AvatarMiddleware) AvatarThumb(c *gin.Context) {
 			// 获取头像缩略图地址
 			filepath, err = a.uploadsService.AvatarThumbFile(c, filename, size)
 			if err != nil {
-				fmt.Println("获取头像缩略图地址失败", err)
+				log.WithContext(c).Errorf("获取头像缩略图 %s 地址失败 %v", filename, err)
 				c.Abort()
 				return
 			}
@@ -57,14 +58,14 @@ func (a *AvatarMiddleware) AvatarThumb(c *gin.Context) {
 		// 读取头像缩略图文件
 		avatarFile, err := os.ReadFile(filepath)
 		if err != nil {
-			fmt.Println("读取头像缩略图文件失败", err)
+			log.WithContext(c).Errorf("读取头像缩略图文件 %s 失败 %v", filepath, err)
 			c.Abort()
 			return
 		}
 
 		// 写入头像缩略图文件
 		if _, err := c.Writer.Write(avatarFile); err != nil {
-			fmt.Println("写入头像缩略图文件失败", err)
+			log.WithContext(c).Errorf("写入头像缩略图文件失败 %s", err)
 		}
 		c.Abort()
 		return

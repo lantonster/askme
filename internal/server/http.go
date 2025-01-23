@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"errors"
-	"fmt"
 	"html/template"
 	"io/fs"
 	"net/http"
@@ -14,6 +13,7 @@ import (
 	"github.com/lantonster/askme/internal/conf"
 	"github.com/lantonster/askme/internal/middleware"
 	"github.com/lantonster/askme/internal/router"
+	"github.com/lantonster/askme/pkg/log"
 	"github.com/lantonster/askme/pkg/utils"
 	"github.com/lantonster/askme/ui"
 )
@@ -28,20 +28,22 @@ func NewHttpServer(
 	gin.SetMode(utils.Ternary(config.Server.Http.Debug, gin.DebugMode, gin.ReleaseMode))
 
 	r := gin.New()
-	r.GET("/ping", func(c *gin.Context) { c.String(http.StatusOK, "pong") })
 
 	// 注册 html 模板
 	html, _ := fs.Sub(ui.Template, "template")
 	htmlTemplate := template.Must(template.New("").Funcs(funcMap).ParseFS(html, "*"))
 	r.SetHTMLTemplate(htmlTemplate)
 
+	// TODO middleware: langeuage, session, cors, logger, recovery, short id
+	r.GET("/ping", func(c *gin.Context) { c.String(http.StatusOK, "pong") })
+
 	// 注册 UI 路由
 	uiRouter.Register(r)
 
-	// 注册 swagger 路由
+	// TODO 注册 swagger 路由
 
 	// 图片路由和登陆验证
-	uploads := r.Group("/uploads", avatarMid.AvatarThumb)
+	uploads := r.Group("/uploads", avatarMid.AvatarThumb /* TODO vist auth */)
 	uploadsRouter.Register(uploads)
 
 	return &Server{
@@ -67,9 +69,9 @@ func (s *Server) Run(c context.Context) error {
 	errCh := make(chan error, 1)
 
 	go func() {
-		fmt.Println("http server start at", s.srv.Addr)
+		log.WithContext(c).Infof("http server start at %v", s.srv.Addr)
 		if err := s.srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			fmt.Println("http server start failed:", err)
+			log.WithContext(c).Errorf("http server start failed: %v", err)
 			errCh <- err
 		}
 	}()
@@ -91,7 +93,7 @@ func (s *Server) Run(c context.Context) error {
 }
 
 func (s *Server) Stop() error {
-	fmt.Println("http server stop")
+	log.WithContext(context.Background()).Info("http server stop")
 	c, cancel := context.WithTimeout(context.Background(), s.ShutdownTimeout)
 	defer cancel()
 	return s.srv.Shutdown(c)

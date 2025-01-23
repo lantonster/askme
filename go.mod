@@ -5,14 +5,18 @@ go 1.21
 require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/gin-gonic/gin v1.10.0
+	github.com/google/uuid v1.4.0
 	github.com/google/wire v0.6.0
+	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/segmentfault/pacman v1.0.4
 	github.com/spf13/cast v1.6.0
 	github.com/spf13/viper v1.19.0
+	go.uber.org/zap v1.21.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
+	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
@@ -53,4 +57,5 @@ require (
 	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )

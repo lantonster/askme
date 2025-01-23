@@ -2,12 +2,15 @@ package conf
 
 import (
 	"time"
+
+	"github.com/lantonster/askme/pkg/log"
 )
 
 type Config struct {
-	Server  *Server  `yaml:"server" mapstructure:"server"`   // 服务
-	UI      *UI      `yaml:"ui" mapstructure:"ui"`           // ui 配置
-	Uploads *Uploads `yaml:"uploads" mapstructure:"uploads"` // 上传配置
+	Server  *Server     `yaml:"server" mapstructure:"server"`   // 服务
+	UI      *UI         `yaml:"ui" mapstructure:"ui"`           // ui 配置
+	Uploads *Uploads    `yaml:"uploads" mapstructure:"uploads"` // 上传配置
+	Logger  *log.Config `yaml:"logger" mapstructure:"logger"`   // 日志配置
 }
 
 type Server struct {

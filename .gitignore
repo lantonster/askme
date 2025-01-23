@@ -1,5 +1,6 @@
 /config.yaml
 .vscode
+.data
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,macos,go
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,macos,go

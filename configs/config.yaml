@@ -5,3 +5,5 @@ server:
     shutdown_timeout: 1m
 ui:
   base_url: ""
+uploads:
+  path: .data/uploads

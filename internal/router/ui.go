@@ -12,10 +12,14 @@ import (
 	"github.com/lantonster/askme/ui"
 )
 
-type UiRouter struct{}
+type UiRouter struct {
+	uiConfig *conf.UI
+}
 
-func NewUiRouter() *UiRouter {
-	return &UiRouter{}
+func NewUiRouter(config *conf.Config) *UiRouter {
+	return &UiRouter{
+		uiConfig: config.UI,
+	}
 }
 
 type _resource struct {
@@ -28,12 +32,11 @@ type _resource struct {
 // 这里的 name 是相对于 ui/build/static 路径的，所以需要拼接上 static
 func (r *_resource) Open(name string) (fs.File, error) {
 	name = fmt.Sprintf("build/static/%s", name)
-	fmt.Println("open static path", name)
 	return r.fs.Open(name)
 }
 
-func (r *UiRouter) Register(engine *gin.Engine, config *conf.Config) {
-	baseUrl := config.UI.BaseUrl
+func (r *UiRouter) Register(engine *gin.Engine) {
+	baseUrl := r.uiConfig.BaseUrl
 
 	// 注册静态资源路径为 {baseUrl}/static，即请求 {baseUrl}/static/xxx 时，会从 ui/build/static/xxx 路径下获取资源
 	engine.StaticFS(baseUrl+"/static", http.FS(&_resource{fs: ui.Build}))

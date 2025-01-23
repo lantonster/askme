@@ -8,15 +8,20 @@ package wire
 
 import (
 	"github.com/lantonster/askme/internal/conf"
+	"github.com/lantonster/askme/internal/middleware"
 	"github.com/lantonster/askme/internal/router"
 	"github.com/lantonster/askme/internal/server"
+	"github.com/lantonster/askme/internal/service/uploads"
 )
 
 // Injectors from wire.go:
 
 func Init() *server.Server {
 	config := conf.NewConfig()
-	uiRouter := router.NewUiRouter()
-	serverServer := server.NewHttpServer(config, uiRouter)
+	uiRouter := router.NewUiRouter(config)
+	uploadsRouter := router.NewUploadsRouter(config)
+	uploadsService := uploads.NewUploadsService(config)
+	avatarMiddleware := middleware.NewAvatarMiddleware(config, uploadsService)
+	serverServer := server.NewHttpServer(config, uiRouter, uploadsRouter, avatarMiddleware)
 	return serverServer
 }

@@ -1,10 +1,13 @@
 package conf
 
-import "time"
+import (
+	"time"
+)
 
 type Config struct {
-	Server *Server `yaml:"server" mapstructure:"server"` // 服务
-	UI     *UI     `yaml:"ui" mapstructure:"ui"`         // ui 配置
+	Server  *Server  `yaml:"server" mapstructure:"server"`   // 服务
+	UI      *UI      `yaml:"ui" mapstructure:"ui"`           // ui 配置
+	Uploads *Uploads `yaml:"uploads" mapstructure:"uploads"` // 上传配置
 }
 
 type Server struct {

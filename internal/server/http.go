@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lantonster/askme/internal/conf"
+	"github.com/lantonster/askme/internal/middleware"
 	"github.com/lantonster/askme/internal/router"
 	"github.com/lantonster/askme/pkg/utils"
 	"github.com/lantonster/askme/ui"
@@ -20,6 +21,8 @@ import (
 func NewHttpServer(
 	config *conf.Config,
 	uiRouter *router.UiRouter,
+	uploadsRouter *router.UploadsRouter,
+	avatarMid *middleware.AvatarMiddleware,
 ) *Server {
 	// 设置 gin 的运行模式
 	gin.SetMode(utils.Ternary(config.Server.Http.Debug, gin.DebugMode, gin.ReleaseMode))
@@ -33,7 +36,13 @@ func NewHttpServer(
 	r.SetHTMLTemplate(htmlTemplate)
 
 	// 注册 UI 路由
-	uiRouter.Register(r, config)
+	uiRouter.Register(r)
+
+	// 注册 swagger 路由
+
+	// 图片路由和登陆验证
+	uploads := r.Group("/uploads", avatarMid.AvatarThumb)
+	uploadsRouter.Register(uploads)
 
 	return &Server{
 		ShutdownTimeout: config.Server.Http.ShutdownTimeout,

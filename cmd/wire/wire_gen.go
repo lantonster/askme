@@ -18,10 +18,11 @@ import (
 
 func Init() *server.Server {
 	config := conf.NewConfig()
+	swaggerRouter := router.NewSwaggerRouter(config)
 	uiRouter := router.NewUiRouter(config)
 	uploadsRouter := router.NewUploadsRouter(config)
 	uploadsService := uploads.NewUploadsService(config)
 	avatarMiddleware := middleware.NewAvatarMiddleware(config, uploadsService)
-	serverServer := server.NewHttpServer(config, uiRouter, uploadsRouter, avatarMiddleware)
+	serverServer := server.NewHttpServer(config, swaggerRouter, uiRouter, uploadsRouter, avatarMiddleware)
 	return serverServer
 }

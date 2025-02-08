@@ -20,6 +20,7 @@ import (
 
 func NewHttpServer(
 	config *conf.Config,
+	swaggerRouter *router.SwaggerRouter,
 	uiRouter *router.UiRouter,
 	uploadsRouter *router.UploadsRouter,
 	avatarMid *middleware.AvatarMiddleware,
@@ -41,11 +42,11 @@ func NewHttpServer(
 	r.Use(middleware.SetStaticCacheHeader) // 设置静态文件缓存
 	uiRouter.Register(r)
 
-	// TODO 注册 swagger 路由
+	// 注册 swagger 路由
+	swaggerRouter.Register(r.Group("/swagger"))
 
 	// 图片路由和登陆验证
-	uploads := r.Group("/uploads", avatarMid.AvatarThumb /* TODO vist auth */)
-	uploadsRouter.Register(uploads)
+	uploadsRouter.Register(r.Group("/uploads", avatarMid.AvatarThumb /* TODO vist auth */))
 
 	return &Server{
 		ShutdownTimeout: config.Server.Http.ShutdownTimeout,

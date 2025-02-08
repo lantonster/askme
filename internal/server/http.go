@@ -38,6 +38,7 @@ func NewHttpServer(
 	r.GET("/ping", func(c *gin.Context) { c.String(http.StatusOK, "pong") })
 
 	// 注册 UI 路由
+	r.Use(middleware.SetStaticCacheHeader) // 设置静态文件缓存
 	uiRouter.Register(r)
 
 	// TODO 注册 swagger 路由

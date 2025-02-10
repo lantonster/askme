@@ -10,9 +10,9 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
 	"github.com/lantonster/askme/internal/conf"
-	"github.com/lantonster/askme/internal/constant/reason"
 	"github.com/lantonster/askme/pkg/dir"
 	"github.com/lantonster/askme/pkg/errors"
+	"github.com/lantonster/askme/pkg/reason"
 )
 
 var (

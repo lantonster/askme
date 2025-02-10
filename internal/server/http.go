@@ -20,6 +20,7 @@ import (
 
 func NewHttpServer(
 	config *conf.Config,
+	askmeRouter *router.AskMeRouter,
 	swaggerRouter *router.SwaggerRouter,
 	uiRouter *router.UiRouter,
 	uploadsRouter *router.UploadsRouter,
@@ -32,7 +33,7 @@ func NewHttpServer(
 
 	// 注册 html 模板
 	html, _ := fs.Sub(ui.Template, "template")
-	htmlTemplate := template.Must(template.New("").Funcs(funcMap).ParseFS(html, "*"))
+	htmlTemplate := template.Must(template.New("").Funcs(funcMap).ParseFS(html, "*")) // TODO funcmap
 	r.SetHTMLTemplate(htmlTemplate)
 
 	// TODO middleware: langeuage, session, cors, logger, recovery, short id
@@ -47,6 +48,13 @@ func NewHttpServer(
 
 	// 图片路由和登陆验证
 	uploadsRouter.Register(r.Group("/uploads", avatarMid.AvatarThumb /* TODO vist auth */))
+
+	// 注册 askme 路由
+	askme := r.Group("/askme/api/v1")
+	{
+		// 不需要鉴权的路由
+		askmeRouter.RegisterNoAuth(askme)
+	}
 
 	return &Server{
 		ShutdownTimeout: config.Server.Http.ShutdownTimeout,

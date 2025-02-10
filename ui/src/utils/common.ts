@@ -161,15 +161,15 @@ function handleFormError(
   if (error.list?.length > 0) {
     error.list.forEach((item) => {
       if (keymap?.length) {
-        const key = keymap.find((k) => k.from === item.error_field);
+        const key = keymap.find((k) => k.from === item.field);
         if (key) {
-          item.error_field = key.to;
+          item.field = key.to;
         }
       }
-      const errorFieldObject = data[item.error_field];
+      const errorFieldObject = data[item.field];
       if (errorFieldObject) {
         errorFieldObject.isInvalid = true;
-        errorFieldObject.errorMsg = item.error_msg;
+        errorFieldObject.errorMsg = item.error;
       }
     });
   }

@@ -2,7 +2,8 @@ package router
 
 import "github.com/google/wire"
 
-var ProviderSetRouter = wire.NewSet(
+var ProviderSet = wire.NewSet(
+	NewAskMeRouter,
 	NewSwaggerRouter,
 	NewUiRouter,
 	NewUploadsRouter,

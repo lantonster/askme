@@ -5,6 +5,6 @@ import (
 	"github.com/lantonster/askme/internal/service/uploads"
 )
 
-var ProviderSetService = wire.NewSet(
+var ProviderSet = wire.NewSet(
 	uploads.NewUploadsService,
 )

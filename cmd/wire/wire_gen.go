@@ -8,6 +8,7 @@ package wire
 
 import (
 	"github.com/lantonster/askme/internal/conf"
+	"github.com/lantonster/askme/internal/controller"
 	"github.com/lantonster/askme/internal/middleware"
 	"github.com/lantonster/askme/internal/router"
 	"github.com/lantonster/askme/internal/server"
@@ -18,11 +19,13 @@ import (
 
 func Init() *server.Server {
 	config := conf.NewConfig()
+	userController := controller.NewUserController()
+	askMeRouter := router.NewAskMeRouter(userController)
 	swaggerRouter := router.NewSwaggerRouter(config)
 	uiRouter := router.NewUiRouter(config)
 	uploadsRouter := router.NewUploadsRouter(config)
 	uploadsService := uploads.NewUploadsService(config)
 	avatarMiddleware := middleware.NewAvatarMiddleware(config, uploadsService)
-	serverServer := server.NewHttpServer(config, swaggerRouter, uiRouter, uploadsRouter, avatarMiddleware)
+	serverServer := server.NewHttpServer(config, askMeRouter, swaggerRouter, uiRouter, uploadsRouter, avatarMiddleware)
 	return serverServer
 }

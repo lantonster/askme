@@ -2,6 +2,7 @@ package errors
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -20,13 +21,17 @@ func New(code int, reason string) *Error {
 	return &Error{Code: code, Reason: reason}
 }
 
+func As(err error, target any) bool {
+	return errors.As(err, target)
+}
+
 // Error return error with info
 func (e *Error) Error() string {
 	return e.Message
 }
 
 // WithMsg with message
-func (e *Error) WithMsg(format string, args ...interface{}) *Error {
+func (e *Error) WithMsg(format string, args ...any) *Error {
 	e.Message = fmt.Sprintf(format, args...)
 	return e
 }

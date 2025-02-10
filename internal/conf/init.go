@@ -11,7 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var ProviderSetConfig = wire.NewSet(NewConfig)
+var ProviderSet = wire.NewSet(NewConfig)
 
 func NewConfig() *Config {
 	config := initDefault()

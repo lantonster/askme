@@ -120,7 +120,7 @@ const Index = (captchaKey: CaptchaKey) => {
 
   const handleCaptchaError = (fel: FieldError[] = []) => {
     const captchaErr = fel.find((o) => {
-      return o.error_field === 'captcha_code';
+      return o.field === 'captcha_code';
     });
 
     const ri = refImgCode.current;
@@ -134,7 +134,7 @@ const Index = (captchaKey: CaptchaKey) => {
         setImgCode({
           ...ri,
           isInvalid: true,
-          errorMsg: captchaErr.error_msg,
+          errorMsg: captchaErr.error,
         });
       }
       fetchCaptchaData();

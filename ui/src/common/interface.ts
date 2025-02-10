@@ -29,8 +29,8 @@ export interface FormDataType {
 }
 
 export interface FieldError {
-  error_field: string;
-  error_msg: string;
+  field: string;
+  error: string;
 }
 
 export interface Paging {

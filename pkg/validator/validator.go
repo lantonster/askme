@@ -8,10 +8,31 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/go-playground/locales"
+	german "github.com/go-playground/locales/de"
+	english "github.com/go-playground/locales/en"
+	spanish "github.com/go-playground/locales/es"
+	french "github.com/go-playground/locales/fr"
+	italian "github.com/go-playground/locales/it"
+	japanese "github.com/go-playground/locales/ja"
+	korean "github.com/go-playground/locales/ko"
+	portuguese "github.com/go-playground/locales/pt"
+	russian "github.com/go-playground/locales/ru"
+	vietnamese "github.com/go-playground/locales/vi"
 	chinese "github.com/go-playground/locales/zh"
+	chineseTraditional "github.com/go-playground/locales/zh_Hant_TW"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	"github.com/go-playground/validator/v10/translations/en"
+	"github.com/go-playground/validator/v10/translations/es"
+	"github.com/go-playground/validator/v10/translations/fr"
+	"github.com/go-playground/validator/v10/translations/it"
+	"github.com/go-playground/validator/v10/translations/ja"
+	"github.com/go-playground/validator/v10/translations/pt"
+	"github.com/go-playground/validator/v10/translations/ru"
+	"github.com/go-playground/validator/v10/translations/vi"
 	"github.com/go-playground/validator/v10/translations/zh"
+	"github.com/go-playground/validator/v10/translations/zh_tw"
 	"github.com/lantonster/askme/pkg/errors"
 	"github.com/lantonster/askme/pkg/log"
 	"github.com/lantonster/askme/pkg/reason"
@@ -20,11 +41,58 @@ import (
 	"github.com/segmentfault/pacman/i18n"
 )
 
-var defaultValidator *validator.Validate
-var defaultTranslator ut.Translator
+type TranslatorLocal struct {
+	La           i18n.Language
+	Lo           locales.Translator
+	RegisterFunc func(v *validator.Validate, trans ut.Translator) (err error)
+}
 
-// init 函数在包初始化时被调用
+type Validator struct {
+	Validate *validator.Validate
+	Tran     ut.Translator
+	Lang     i18n.Language
+}
+
+var (
+	allLanguageTranslators = []*TranslatorLocal{
+		{La: i18n.LanguageChinese, Lo: chinese.New(), RegisterFunc: zh.RegisterDefaultTranslations},
+		{La: i18n.LanguageChineseTraditional, Lo: chineseTraditional.New(), RegisterFunc: zh_tw.RegisterDefaultTranslations},
+		{La: i18n.LanguageEnglish, Lo: english.New(), RegisterFunc: en.RegisterDefaultTranslations},
+		{La: i18n.LanguageGerman, Lo: german.New(), RegisterFunc: nil},
+		{La: i18n.LanguageSpanish, Lo: spanish.New(), RegisterFunc: es.RegisterDefaultTranslations},
+		{La: i18n.LanguageFrench, Lo: french.New(), RegisterFunc: fr.RegisterDefaultTranslations},
+		{La: i18n.LanguageItalian, Lo: italian.New(), RegisterFunc: it.RegisterDefaultTranslations},
+		{La: i18n.LanguageJapanese, Lo: japanese.New(), RegisterFunc: ja.RegisterDefaultTranslations},
+		{La: i18n.LanguageKorean, Lo: korean.New(), RegisterFunc: nil},
+		{La: i18n.LanguagePortuguese, Lo: portuguese.New(), RegisterFunc: pt.RegisterDefaultTranslations},
+		{La: i18n.LanguageRussian, Lo: russian.New(), RegisterFunc: ru.RegisterDefaultTranslations},
+		{La: i18n.LanguageVietnamese, Lo: vietnamese.New(), RegisterFunc: vi.RegisterDefaultTranslations},
+	}
+)
+
+var GlobalValidatorMapping = make(map[i18n.Language]*Validator, 0)
+
 func init() {
+	for _, t := range allLanguageTranslators {
+		tran, val := getTran(t.Lo), createDefaultValidator(t.La)
+		if t.RegisterFunc != nil {
+			if err := t.RegisterFunc(val, tran); err != nil {
+				panic(err)
+			}
+		}
+		GlobalValidatorMapping[t.La] = &Validator{Validate: val, Tran: tran, Lang: t.La}
+	}
+}
+
+func getTran(lo locales.Translator) ut.Translator {
+	tran, ok := ut.New(lo, lo).GetTranslator(lo.Locale())
+	if !ok {
+		panic(fmt.Sprintf("not found translator %s", lo.Locale()))
+	}
+	return tran
+}
+
+func createDefaultValidator(la i18n.Language) *validator.Validate {
 	// 创建一个新的验证器
 	validate := validator.New()
 
@@ -36,7 +104,7 @@ func init() {
 	validate.RegisterTagNameFunc(func(fld reflect.StructField) (res string) {
 		defer func() {
 			if len(res) > 0 {
-				res = translator.Tr(i18n.LanguageChinese, res)
+				res = translator.Tr(la, res)
 			}
 		}()
 		if jsonTag := fld.Tag.Get("json"); len(jsonTag) > 0 {
@@ -51,19 +119,7 @@ func init() {
 		return fld.Name
 	})
 
-	// 将创建的验证器设置为默认验证器
-	defaultValidator = validate
-
-	var ok bool
-	cn := chinese.New()
-	defaultTranslator, ok = ut.New(cn, cn).GetTranslator(cn.Locale())
-	if !ok {
-		log.WithContext(context.Background()).Fatalf("not found translator %s", cn.Locale())
-	}
-
-	if err := zh.RegisterDefaultTranslations(defaultValidator, defaultTranslator); err != nil {
-		log.WithContext(context.Background()).Fatalf("register translator failed: %v", err)
-	}
+	return validate
 }
 
 // NotBlank 函数用于检查字段是否不为空白。
@@ -152,6 +208,13 @@ func (v ValidationErrors) Error() string {
 	return strings.TrimSpace(buff.String())
 }
 
+func GetValidatorByLang(lang i18n.Language) *Validator {
+	if GlobalValidatorMapping[lang] != nil {
+		return GlobalValidatorMapping[lang]
+	}
+	return GlobalValidatorMapping[i18n.DefaultLanguage]
+}
+
 // Check 函数用于对给定的值进行校验，并处理校验结果。
 //
 // 参数:
@@ -161,7 +224,7 @@ func (v ValidationErrors) Error() string {
 // 返回:
 //   - []*FieldError: 包含校验错误信息的字段数组
 //   - error: 可能出现的错误
-func Check(c context.Context, value any) (fields []*FieldError, err error) {
+func (v *Validator) Check(c context.Context, value any) (fields []*FieldError, err error) {
 	// 对校验错误字段进行一些处理：
 	//   - 如果字段名的第一个字符是字母且为拉丁字符，则将其首字母转换为大写，并在末尾添加句号。
 	defer func() {
@@ -188,7 +251,7 @@ func Check(c context.Context, value any) (fields []*FieldError, err error) {
 	}()
 
 	// 进行默认的结构体校验
-	if err = defaultValidator.Struct(value); err != nil {
+	if err = v.Validate.Struct(value); err != nil {
 		var errs validator.ValidationErrors
 		if !errors.As(err, &errs) {
 			// 记录校验出错时的错误信息
@@ -199,7 +262,7 @@ func Check(c context.Context, value any) (fields []*FieldError, err error) {
 		for _, field := range errs {
 			fieldErr := &FieldError{
 				Field: field.Field(),
-				Error: field.Translate(defaultTranslator),
+				Error: field.Translate(v.Tran),
 			}
 
 			structNamespace := field.StructNamespace()

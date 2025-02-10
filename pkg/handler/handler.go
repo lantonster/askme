@@ -19,6 +19,9 @@ import (
 // 返回:
 //   - bool: 如果绑定或校验失败则为 true，否则为 false
 func BindAndCheck(c *gin.Context, req any) (abort bool) {
+	lang := GetLang(c)
+	c.Set(AcceptLanguageFlag, lang)
+
 	// 尝试绑定请求参数到给定的结构体
 	if err := c.ShouldBind(req); err != nil {
 		log.WithContext(c).Errorf("http 解析请求参数失败: %v", err)
@@ -27,7 +30,7 @@ func BindAndCheck(c *gin.Context, req any) (abort bool) {
 	}
 
 	// 进行请求参数的校验
-	if fields, err := validator.Check(c, req); err != nil {
+	if fields, err := validator.GetValidatorByLang(lang).Check(c, req); err != nil {
 		log.WithContext(c).Errorf("http 校验请求参数失败: %v", err)
 		Response(c, err, fields)
 		return true

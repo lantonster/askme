@@ -1,6 +1,7 @@
 package i18n
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -8,9 +9,10 @@ import (
 	"strings"
 
 	goI18n "github.com/LinkinStars/go-i18n/v2/i18n"
+	"github.com/lantonster/askme/pkg/log"
 	"github.com/lantonster/askme/pkg/utils"
 	"golang.org/x/text/language"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -23,7 +25,7 @@ func init() {
 	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 
 	// 添加默认的翻译器
-	addTranslator(string(DefaultLanguage), en_us)
+	addTranslator(fmt.Sprintf("%s.yaml", DefaultLanguage), en_us)
 }
 
 type Config struct {
@@ -72,30 +74,79 @@ func SetTranslator(config *Config) error {
 		}
 
 		// 提取语言名称并添加翻译器
-		languageName := strings.TrimSuffix(file.Name(), ext)
-		addTranslator(languageName, buffer)
+		if err := addTranslator(file.Name(), buffer); err != nil {
+			log.WithContext(context.Background()).Warnf("add translator [%s] failed: %v", file.Name(), err)
+		}
 	}
 
 	return nil
 }
 
-func addTranslator(lang string, data []byte) error {
+func addTranslator(fileName string, data []byte) error {
+	ext := filepath.Ext(fileName)
+	lang := strings.TrimSuffix(fileName, ext)
+
+	copy, err := copyBackend(data)
+	if err != nil {
+		return fmt.Errorf("copy backend failed: %w", err)
+	}
+
 	// 解析消息文件
-	if _, err := bundle.ParseMessageFileBytes(data, lang); err != nil {
-		return fmt.Errorf("parse language message file [%s] failed: %w", lang, err)
+	if _, err := bundle.ParseMessageFileBytes(copy, fileName); err != nil {
+		return fmt.Errorf("parse language message file [%s] failed: %w", fileName, err)
 	}
 
 	// 创建并设置本地化对象
 	localizes[Language(lang)] = goI18n.NewLocalizer(bundle, lang)
 
 	// 将 YAML 内容转换为 JSON 格式并保存
-	jsonBytes, err := utils.YamlToJson(data)
+	jsonMap, err := utils.YamlToJson(data)
 	if err != nil {
 		return fmt.Errorf("parse language message file [%s] to json failed: %w", lang, err)
 	}
-	jsonData[Language(lang)] = jsonBytes
+	jsonData[Language(lang)] = jsonMap
 
 	return nil
+}
+
+// copyBackend 函数用于复制 YAML 数据中的 backend 部分。
+//
+// 参数:
+//   - data: 原始的 YAML 格式的字节数据
+//
+// 返回:
+//   - []byte: 复制处理后的 YAML 字节数据
+//   - error: 处理过程中可能出现的错误
+func copyBackend(data []byte) ([]byte, error) {
+	// 定义一个结构体用于解析原始的 YAML 数据
+	original := struct {
+		Backend map[string]map[string]any `yaml:"backend"`
+		UI      map[string]any            `yaml:"ui"`
+		Plugin  map[string]any            `yaml:"plugin"`
+	}{}
+
+	// 尝试将输入的字节数据解析为定义的结构体
+	if err := yaml.Unmarshal(data, &original); err != nil {
+		return nil, fmt.Errorf("unmarshal yaml failed: %w", err)
+	}
+
+	// 创建一个新的映射用于存储复制的数据
+	copy := map[string]any{
+		"backend": make(map[string]map[string]any),
+		"ui":      original.UI,
+		"plugin":  original.Plugin,
+	}
+	// 复制后端数据
+	for k, v := range original.Backend {
+		copy[k] = v
+	}
+
+	// 将复制后的数据序列化为 YAML 格式
+	content, err := yaml.Marshal(copy)
+	if err != nil {
+		return nil, fmt.Errorf("marshal yaml failed: %w", err)
+	}
+	return content, nil
 }
 
 // Dump 函数将指定语言的 JSON 数据进行序列化。

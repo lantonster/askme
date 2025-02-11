@@ -21,5 +21,5 @@ const (
 	DefaultLanguage = LanguageEnglish
 )
 
-//go:embed  en_us.yaml
+//go:embed  en_US.yaml
 var en_us []byte

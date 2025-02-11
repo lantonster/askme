@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/wire"
 	"github.com/lantonster/askme/configs"
+	"github.com/lantonster/askme/pkg/i18n"
 	"github.com/lantonster/askme/pkg/log"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
@@ -31,8 +32,14 @@ func NewConfig() *Config {
 		panic(err)
 	}
 
-	log.SetLogger(config.Logger) // 初始化日志
+	// 初始化日志
+	log.SetLogger(config.Logger)
 	log.WithContext(context.Background()).Info("config init success")
+
+	// 初始化国际化
+	i18n.SetTranslator(config.I18n)
+	log.WithContext(context.Background()).Info("i18n init success")
+
 	return config
 }
 

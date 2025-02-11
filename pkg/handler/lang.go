@@ -23,7 +23,7 @@ import (
 	"context"
 
 	"github.com/gin-gonic/gin"
-	"github.com/segmentfault/pacman/i18n"
+	"github.com/lantonster/askme/pkg/i18n"
 )
 
 const AcceptLanguageFlag = "Accept-Language"

@@ -34,11 +34,10 @@ import (
 	"github.com/go-playground/validator/v10/translations/zh"
 	"github.com/go-playground/validator/v10/translations/zh_tw"
 	"github.com/lantonster/askme/pkg/errors"
+	"github.com/lantonster/askme/pkg/i18n"
 	"github.com/lantonster/askme/pkg/log"
 	"github.com/lantonster/askme/pkg/reason"
-	"github.com/lantonster/askme/pkg/translator"
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/segmentfault/pacman/i18n"
 )
 
 type TranslatorLocal struct {
@@ -104,7 +103,7 @@ func createDefaultValidator(la i18n.Language) *validator.Validate {
 	validate.RegisterTagNameFunc(func(fld reflect.StructField) (res string) {
 		defer func() {
 			if len(res) > 0 {
-				res = translator.Tr(la, res)
+				res = i18n.Tr(la, res)
 			}
 		}()
 		if jsonTag := fld.Tag.Get("json"); len(jsonTag) > 0 {

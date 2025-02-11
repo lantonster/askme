@@ -3,15 +3,17 @@ package conf
 import (
 	"time"
 
+	"github.com/lantonster/askme/pkg/i18n"
 	"github.com/lantonster/askme/pkg/log"
 )
 
 type Config struct {
-	Server  *Server     `yaml:"server" mapstructure:"server"`   // 服务
-	Swagger *Swagger    `yaml:"swagger" mapstructure:"swagger"` // swagger 配置
-	UI      *UI         `yaml:"ui" mapstructure:"ui"`           // ui 配置
-	Uploads *Uploads    `yaml:"uploads" mapstructure:"uploads"` // 上传配置
-	Logger  *log.Config `yaml:"logger" mapstructure:"logger"`   // 日志配置
+	Server  *Server      `yaml:"server" mapstructure:"server"`   // 服务
+	Swagger *Swagger     `yaml:"swagger" mapstructure:"swagger"` // swagger 配置
+	UI      *UI          `yaml:"ui" mapstructure:"ui"`           // ui 配置
+	Uploads *Uploads     `yaml:"uploads" mapstructure:"uploads"` // 上传配置
+	Logger  *log.Config  `yaml:"logger" mapstructure:"logger"`   // 日志配置
+	I18n    *i18n.Config `yaml:"i18n" mapstructure:"i18n"`       // 国际化配置
 }
 
 type Server struct {

@@ -18,3 +18,5 @@ logger:
   max_size: 100
   max_backups: 10
   compress: true
+i18n:
+  bundle_dir: .data/i18n

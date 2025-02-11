@@ -10,8 +10,7 @@ import (
 
 	"github.com/lantonster/askme/internal/schema"
 	"github.com/lantonster/askme/pkg/day"
-	"github.com/lantonster/askme/pkg/translator"
-	"github.com/segmentfault/pacman/i18n"
+	"github.com/lantonster/askme/pkg/i18n"
 	"github.com/spf13/cast"
 )
 
@@ -44,7 +43,7 @@ var funcMap = template.FuncMap{
 		return template.HTML(FormatLinkNofollow(data))
 	},
 	"translator": func(la i18n.Language, data string, params ...any) string {
-		trans := translator.GlobalTrans.Tr(la, data)
+		trans := i18n.Tr(la, data)
 
 		if len(params) > 0 && len(params)%2 == 0 {
 			for i := 0; i < len(params); i += 2 {
@@ -62,7 +61,7 @@ var funcMap = template.FuncMap{
 		return time.Unix(timestamp, 0).Format("2006-01-02T15:04:05.000Z")
 	},
 	"translatorTimeFormatLongDate": func(la i18n.Language, tz string, timestamp int64) string {
-		trans := translator.GlobalTrans.Tr(la, "ui.dates.long_date_with_time")
+		trans := i18n.Tr(la, "ui.dates.long_date_with_time")
 		return day.Format(timestamp, trans, tz)
 	},
 	"translatorTimeFormat": func(la i18n.Language, tz string, timestamp int64) string {
@@ -77,34 +76,34 @@ var funcMap = template.FuncMap{
 		}
 
 		if between <= 1 {
-			return translator.GlobalTrans.Tr(la, "ui.dates.now")
+			return i18n.Tr(la, "ui.dates.now")
 		}
 
 		if between > 1 && between < 60 {
-			trans = translator.GlobalTrans.Tr(la, "ui.dates.x_seconds_ago")
+			trans = i18n.Tr(la, "ui.dates.x_seconds_ago")
 			return strings.ReplaceAll(trans, "{{count}}", cast.ToString(between))
 		}
 
 		if between >= 60 && between < 3600 {
 			min := math.Floor(float64(between) / 60)
-			trans = translator.GlobalTrans.Tr(la, "ui.dates.x_minutes_ago")
+			trans = i18n.Tr(la, "ui.dates.x_minutes_ago")
 			return strings.ReplaceAll(trans, "{{count}}", strconv.FormatFloat(min, 'f', 0, 64))
 		}
 
 		if between >= 3600 && between < 3600*24 {
 			h := math.Floor(float64(between) / 3600)
-			trans = translator.GlobalTrans.Tr(la, "ui.dates.x_hours_ago")
+			trans = i18n.Tr(la, "ui.dates.x_hours_ago")
 			return strings.ReplaceAll(trans, "{{count}}", strconv.FormatFloat(h, 'f', 0, 64))
 		}
 
 		if between >= 3600*24 &&
 			between < 3600*24*366 &&
 			time.Unix(timestamp, 0).Format("2006") == time.Unix(now, 0).Format("2006") {
-			trans = translator.GlobalTrans.Tr(la, "ui.dates.long_date")
+			trans = i18n.Tr(la, "ui.dates.long_date")
 			return day.Format(timestamp, trans, tz)
 		}
 
-		trans = translator.GlobalTrans.Tr(la, "ui.dates.long_date_with_year")
+		trans = i18n.Tr(la, "ui.dates.long_date_with_year")
 		return day.Format(timestamp, trans, tz)
 	},
 	"wrapComments": func(comments []*schema.GetCommentResp, la i18n.Language, tz string) map[string]any {

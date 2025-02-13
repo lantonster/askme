@@ -10,17 +10,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lantonster/askme/internal/conf"
-	"github.com/lantonster/askme/internal/service/uploads"
+	"github.com/lantonster/askme/internal/service"
 	"github.com/lantonster/askme/pkg/log"
 	"github.com/spf13/cast"
 )
 
 type AvatarMiddleware struct {
 	uploadsConfig  *conf.Uploads
-	uploadsService uploads.UploadsService
+	uploadsService service.UploadsService
 }
 
-func NewAvatarMiddleware(config *conf.Config, uploadsService uploads.UploadsService) *AvatarMiddleware {
+func NewAvatarMiddleware(config *conf.Config, uploadsService service.UploadsService) *AvatarMiddleware {
 	return &AvatarMiddleware{
 		uploadsConfig:  config.Uploads,
 		uploadsService: uploadsService,

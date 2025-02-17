@@ -29,4 +29,10 @@ const (
 
 	// 密码强度过低
 	PasswordStrengthTooLow = "error.password.strength_too_low"
+
+	// site_info 不存在
+	SiteInfoNotFound = "error.site_info.not_found"
+
+	// 不允许用户注册
+	UserRegistrationNotAllowed = "error.user.registration_not_allowed"
 )

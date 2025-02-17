@@ -25,6 +25,10 @@ func As(err error, target any) bool {
 	return errors.As(err, target)
 }
 
+func Is(err error, target error) bool {
+	return errors.Is(err, target)
+}
+
 // Error return error with info
 func (e *Error) Error() string {
 	return e.Message

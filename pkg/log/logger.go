@@ -11,7 +11,28 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var defaultLogger = zap.NewExample().Sugar()
+var defaultLogger = Logger{logger: zap.NewExample().Sugar()}
+
+type Logger struct {
+	logger *zap.SugaredLogger
+}
+
+// WithContext 为日志记录器添加上下文信息。
+func (l *Logger) WithContext(c context.Context) *zap.SugaredLogger {
+	// 如果上下文为空，直接返回日志记录器，不进行任何修改。
+	if c == nil {
+		return l.logger
+	}
+
+	// 尝试从上下文中获取跟踪ID。
+	// 如果能够成功获取到字符串类型的跟踪ID，则为日志记录器添加"trace_id"字段。
+	if traceId, ok := c.Value(tracer.TraceIdKey).(string); ok {
+		return l.logger.With(tracer.TraceIdKey, traceId)
+	}
+
+	// 如果上下文中没有跟踪ID，或者获取失败，则返回原始日志记录器。
+	return l.logger
+}
 
 type Config struct {
 	Level      int8   `yaml:"level" mapstructure:"level"`             // 日志级别: [-1, 5] debug, info, warn, error, dpanic, panic, fatal
@@ -47,24 +68,12 @@ func SetLogger(config *Config) {
 		zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), zapcore.Level(config.Level)),
 	)
 
-	defaultLogger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel)).Sugar()
-	defaultLogger.Info("logger init success")
+	defaultLogger = Logger{logger: zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel)).Sugar()}
+	WithContext(context.Background()).Info("logger init success")
 }
 
 // WithContext 为日志记录器添加上下文信息。
 // 如果上下文中包含跟踪 id，则将其添加到日志中以增强可追踪性。
 func WithContext(c context.Context) *zap.SugaredLogger {
-	// 如果上下文为空，直接返回日志记录器，不进行任何修改。
-	if c == nil {
-		return defaultLogger
-	}
-
-	// 尝试从上下文中获取跟踪ID。
-	// 如果能够成功获取到字符串类型的跟踪ID，则为日志记录器添加"trace_id"字段。
-	if traceId, ok := c.Value(tracer.TraceIdKey).(string); ok {
-		return defaultLogger.With(tracer.TraceIdKey, traceId)
-	}
-
-	// 如果上下文中没有跟踪ID，或者获取失败，则返回原始日志记录器。
-	return defaultLogger
+	return defaultLogger.WithContext(c)
 }

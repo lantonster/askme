@@ -106,7 +106,7 @@ var funcMap = template.FuncMap{
 		trans = i18n.Tr(la, "ui.dates.long_date_with_year")
 		return day.Format(timestamp, trans, tz)
 	},
-	"wrapComments": func(comments []*schema.GetCommentResp, la i18n.Language, tz string) map[string]any {
+	"wrapComments": func(comments []*schema.GetCommentRes, la i18n.Language, tz string) map[string]any {
 		return map[string]any{
 			"comments": comments,
 			"language": la,

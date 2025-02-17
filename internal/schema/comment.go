@@ -1,3 +1,3 @@
 package schema
 
-type GetCommentResp struct{}
+type GetCommentRes struct{}

@@ -20,3 +20,13 @@ logger:
   compress: true
 i18n:
   bundle_dir: .data/i18n
+mysql:
+  debug: false
+  addr: 127.0.0.1:3306
+  user: root
+  password: 123456
+  db_name: askme
+redis:
+  addr: 127.0.0.1:6379
+  user: root
+  password:

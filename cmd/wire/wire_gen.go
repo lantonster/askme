@@ -9,7 +9,9 @@ package wire
 import (
 	"github.com/lantonster/askme/internal/conf"
 	"github.com/lantonster/askme/internal/controller"
+	"github.com/lantonster/askme/internal/data"
 	"github.com/lantonster/askme/internal/middleware"
+	"github.com/lantonster/askme/internal/repo"
 	"github.com/lantonster/askme/internal/router"
 	"github.com/lantonster/askme/internal/server"
 	"github.com/lantonster/askme/internal/service"
@@ -19,7 +21,12 @@ import (
 
 func Init() *server.Server {
 	config := conf.NewConfig()
-	userController := controller.NewUserController()
+	db := data.NewGormDB(config)
+	cache := data.NewCache(config)
+	dataData := data.NewData(db, cache)
+	siteInfoRepo := repo.NewSiteInfoRepo(dataData)
+	siteInfoService := service.NewSiteInfoService(siteInfoRepo)
+	userController := controller.NewUserController(siteInfoService)
 	askMeRouter := router.NewAskMeRouter(userController)
 	swaggerRouter := router.NewSwaggerRouter(config)
 	uiRouter := router.NewUiRouter(config)

@@ -14,6 +14,8 @@ type Config struct {
 	Uploads *Uploads     `yaml:"uploads" mapstructure:"uploads"` // 上传配置
 	Logger  *log.Config  `yaml:"logger" mapstructure:"logger"`   // 日志配置
 	I18n    *i18n.Config `yaml:"i18n" mapstructure:"i18n"`       // 国际化配置
+	MySQL   *MySQL       `yaml:"mysql" mapstructure:"mysql"`     // mysql 配置
+	Redis   *Redis       `yaml:"redis" mapstructure:"redis"`     // redis 配置
 }
 
 type Server struct {

@@ -3,7 +3,6 @@ package model
 import (
 	"encoding/json"
 	"strings"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -29,10 +28,11 @@ type SiteInfo struct {
 	Id        int64
 	Type      string
 	Content   string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt int64
+	UpdatedAt int64
 
-	Login *SiteInfoLogin `json:"login" gorm:"-"`
+	Genral *SiteInfoGeneral `json:"general" gorm:"-"`
+	Login  *SiteInfoLogin   `json:"login" gorm:"-"`
 }
 
 func (*SiteInfo) TableName() string {
@@ -42,6 +42,10 @@ func (*SiteInfo) TableName() string {
 func (si *SiteInfo) AfterFind(tx *gorm.DB) (err error) {
 	switch si.Type {
 
+	case string(SiteInfoTypeGeneral):
+		si.Genral = &SiteInfoGeneral{}
+		json.Unmarshal([]byte(si.Content), si.Genral)
+
 	case string(SiteInfoTypeLogin):
 		si.Login = &SiteInfoLogin{}
 		json.Unmarshal([]byte(si.Content), si.Login)
@@ -49,6 +53,15 @@ func (si *SiteInfo) AfterFind(tx *gorm.DB) (err error) {
 	}
 
 	return nil
+}
+
+type SiteInfoGeneral struct {
+	CheckUpdate      bool   `json:"check_update"`
+	Name             string `json:"name"`
+	ShortDescription string `json:"short_description"`
+	Description      string `json:"description"`
+	SiteUrl          string `json:"site_url"`
+	ContactEmail     string `json:"contact_email"`
 }
 
 type SiteInfoLogin struct {

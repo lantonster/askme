@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/lantonster/askme/pkg/errors"
 	"github.com/lantonster/askme/pkg/log"
 	"github.com/lantonster/askme/pkg/reason"
+	"github.com/lantonster/askme/pkg/token"
 	"github.com/lantonster/askme/pkg/validator"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -21,18 +21,16 @@ type UserService interface {
 	RegisterUserByEmail(c context.Context, req *schema.RegisterUserByEmailReq) (*schema.RegisterUserByEmailRes, []*validator.FieldError, error)
 }
 
-type userService struct {
-	userRepo repo.UserRepo
+type UserServiceImpl struct {
+	repo *repo.Repo
 }
 
-func NewUserService(userRepo repo.UserRepo) UserService {
-	return &userService{
-		userRepo: userRepo,
-	}
+func NewUserService(repo *repo.Repo) UserService {
+	return &UserServiceImpl{repo: repo}
 }
 
 // encryptPassword 密码加密
-func (s *userService) encryptPassword(c context.Context, password string) (string, error) {
+func (s *UserServiceImpl) encryptPassword(c context.Context, password string) (string, error) {
 	hashPwd, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		log.WithContext(c).Errorf("密码 %s 加密失败: %v", password, err)
@@ -41,10 +39,19 @@ func (s *userService) encryptPassword(c context.Context, password string) (strin
 	return string(hashPwd), nil
 }
 
-func (s *userService) RegisterUserByEmail(c context.Context, req *schema.RegisterUserByEmailReq) (
+func (s *UserServiceImpl) getSiteUrl(c context.Context) string {
+	general, err := siteInfoService.GetSiteGeneral(c)
+	if err != nil {
+		log.WithContext(c).Errorf("获取站点网址发生错误: %v", err)
+		return ""
+	}
+	return general.SiteUrl
+}
+
+func (s *UserServiceImpl) RegisterUserByEmail(c context.Context, req *schema.RegisterUserByEmailReq) (
 	res *schema.RegisterUserByEmailRes, fieldErr []*validator.FieldError, err error) {
 
-	if _, exist, err := s.userRepo.GetUserByEmail(c, req.Email); err != nil {
+	if _, exist, err := s.repo.User.GetUserByEmail(c, req.Email); err != nil {
 		log.WithContext(c).Errorf("邮箱注册前查询邮箱是否存在失败: %v", err)
 		return nil, nil, err
 	} else if exist {
@@ -58,18 +65,25 @@ func (s *userService) RegisterUserByEmail(c context.Context, req *schema.Registe
 		IP:            req.IP,
 		Status:        model.UserStatusAvailable,
 		MailStatus:    model.EmailStatusToBeVerified,
-		LastLoginDate: sql.NullTime{Time: time.Now()},
+		LastLoginDate: time.Now().Unix(),
 	}
 	if user.Password, err = s.encryptPassword(c, req.Pass); err != nil {
 		return nil, nil, err
 	}
-	if user.Username, err = s.userRepo.GenerateUniqueUsername(c, req.Name); err != nil {
+	if user.Username, err = s.repo.User.GenerateUniqueUsername(c, req.Name); err != nil {
 		return nil, []*validator.FieldError{{Field: "name", Error: reason.UsernameInvalid}}, err
 	}
-	if err = s.userRepo.CreateUser(c, user); err != nil {
+	if err = s.repo.User.CreateUser(c, user); err != nil {
 		log.WithContext(c).Errorf("创建用户失败: %v", err)
 		return nil, nil, err
 	}
+
+	code := token.GenerateToken()
+	url := fmt.Sprintf("%s/users/account-activation?code=%s", s.getSiteUrl(c), code)
+	fmt.Printf("url: %v\n", url)
+
+	// TODO role id
+	// TODO avatar
 
 	return nil, nil, nil
 }

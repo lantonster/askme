@@ -10,22 +10,32 @@ import (
 )
 
 type SiteInfoService interface {
+	// GetSiteGeneral 获取站点常规信息
+	GetSiteGeneral(c context.Context) (*schema.GetSiteGeneralRes, error)
+
 	// GetSiteLogin 获取站点登录信息
 	GetSiteLogin(c context.Context) (*schema.GetSiteLoginRes, error)
 }
 
-type siteInfoService struct {
-	siteInfoRepo repo.SiteInfoRepo
+type SiteInfoServiceImpl struct {
+	repo *repo.Repo
 }
 
-func NewSiteInfoService(siteInfoRepo repo.SiteInfoRepo) SiteInfoService {
-	return &siteInfoService{
-		siteInfoRepo: siteInfoRepo,
+func NewSiteInfoService(repo *repo.Repo) SiteInfoService {
+	return &SiteInfoServiceImpl{repo: repo}
+}
+
+func (s *SiteInfoServiceImpl) GetSiteGeneral(c context.Context) (*schema.GetSiteGeneralRes, error) {
+	siteInfo, err := s.repo.SiteInfo.FirstSiteInfoByType(c, model.SiteInfoTypeGeneral)
+	if err != nil {
+		log.WithContext(c).Errorf("获取站点常规信息失败: %v", err)
+		return nil, err
 	}
+	return siteInfo.Genral, nil
 }
 
-func (s *siteInfoService) GetSiteLogin(c context.Context) (*schema.GetSiteLoginRes, error) {
-	siteInfo, err := s.siteInfoRepo.FirstSiteInfoByType(c, model.SiteInfoTypeLogin)
+func (s *SiteInfoServiceImpl) GetSiteLogin(c context.Context) (*schema.GetSiteLoginRes, error) {
+	siteInfo, err := s.repo.SiteInfo.FirstSiteInfoByType(c, model.SiteInfoTypeLogin)
 	if err != nil {
 		log.WithContext(c).Errorf("获取站点登录信息失败: %v", err)
 		return nil, err

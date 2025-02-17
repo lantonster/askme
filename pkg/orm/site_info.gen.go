@@ -30,8 +30,8 @@ func newSiteInfo(db *gorm.DB, opts ...gen.DOOption) siteInfo {
 	_siteInfo.Id = field.NewInt64(tableName, "id")
 	_siteInfo.Type = field.NewString(tableName, "type")
 	_siteInfo.Content = field.NewString(tableName, "content")
-	_siteInfo.CreatedAt = field.NewTime(tableName, "created_at")
-	_siteInfo.UpdatedAt = field.NewTime(tableName, "updated_at")
+	_siteInfo.CreatedAt = field.NewInt64(tableName, "created_at")
+	_siteInfo.UpdatedAt = field.NewInt64(tableName, "updated_at")
 
 	_siteInfo.fillFieldMap()
 
@@ -45,8 +45,8 @@ type siteInfo struct {
 	Id        field.Int64
 	Type      field.String
 	Content   field.String
-	CreatedAt field.Time
-	UpdatedAt field.Time
+	CreatedAt field.Int64
+	UpdatedAt field.Int64
 
 	fieldMap map[string]field.Expr
 }
@@ -66,8 +66,8 @@ func (s *siteInfo) updateTableName(table string) *siteInfo {
 	s.Id = field.NewInt64(table, "id")
 	s.Type = field.NewString(table, "type")
 	s.Content = field.NewString(table, "content")
-	s.CreatedAt = field.NewTime(table, "created_at")
-	s.UpdatedAt = field.NewTime(table, "updated_at")
+	s.CreatedAt = field.NewInt64(table, "created_at")
+	s.UpdatedAt = field.NewInt64(table, "updated_at")
 
 	s.fillFieldMap()
 

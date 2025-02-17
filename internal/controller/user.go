@@ -12,18 +12,11 @@ import (
 )
 
 type UserController struct {
-	siteInfoService service.SiteInfoService
-	userService     service.UserService
+	*service.Service
 }
 
-func NewUserController(
-	siteInfoService service.SiteInfoService,
-	userService service.UserService,
-) *UserController {
-	return &UserController{
-		siteInfoService: siteInfoService,
-		userService:     userService,
-	}
+func NewUserController(service *service.Service) *UserController {
+	return &UserController{Service: service}
 }
 
 // RegisterUserByEmail godoc
@@ -37,7 +30,7 @@ func NewUserController(
 //	@Success		200		{object}	handler.ResponseBody{data=schema.RegisterUserByEmailRes}	"success"
 //	@Router			/askme/api/v1/user/register/email [post]
 func (uc *UserController) RegisterUserByEmail(c *gin.Context) {
-	loginInfo, err := uc.siteInfoService.GetSiteLogin(c)
+	loginInfo, err := uc.SiteInfoService().GetSiteLogin(c)
 	if err != nil {
 		handler.Response(c, err, nil)
 		return
@@ -61,7 +54,7 @@ func (uc *UserController) RegisterUserByEmail(c *gin.Context) {
 		// TODO
 	}
 
-	res, fieldErr, err := uc.userService.RegisterUserByEmail(c, req)
+	res, fieldErr, err := uc.UserService().RegisterUserByEmail(c, req)
 	if len(fieldErr) > 0 {
 		for _, field := range fieldErr {
 			field.Error = i18n.Tr(handler.GetLang(c), field.Error)

@@ -10,7 +10,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.20.0
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/google/uuid v1.4.0
+	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.6.0
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/mozillazg/go-pinyin v0.20.0
@@ -29,6 +29,7 @@ require (
 	gorm.io/gen v0.3.26
 	gorm.io/gorm v1.25.9
 	gorm.io/plugin/dbresolver v1.5.0
+	gorm.io/plugin/soft_delete v1.2.1
 	sigs.k8s.io/yaml v1.3.0
 )
 

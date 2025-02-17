@@ -29,16 +29,16 @@ type UploadsService interface {
 	AvatarThumbFile(c *gin.Context, fileName string, size int) (url string, err error)
 }
 
-type uploadsService struct {
+type UploadsServiceImpl struct {
 	uploadsConfig *conf.Uploads
 }
 
 func NewUploadsService(config *conf.Config) UploadsService {
-	return &uploadsService{uploadsConfig: config.Uploads}
+	return &UploadsServiceImpl{uploadsConfig: config.Uploads}
 }
 
 // AvatarThumbFile 生成头像缩略图文件并返回其路径
-func (s *uploadsService) AvatarThumbFile(c *gin.Context, fileName string, size int) (url string, err error) {
+func (s *UploadsServiceImpl) AvatarThumbFile(c *gin.Context, fileName string, size int) (url string, err error) {
 	suffix := path.Ext(fileName)                                  // 获取文件后缀
 	filePath := path.Join(s.uploadsConfig.AvatarPath(), fileName) // 获取文件路径
 

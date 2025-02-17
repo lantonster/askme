@@ -16,14 +16,14 @@ import (
 )
 
 type AvatarMiddleware struct {
-	uploadsConfig  *conf.Uploads
-	uploadsService service.UploadsService
+	*service.Service
+	uploadsConfig *conf.Uploads
 }
 
-func NewAvatarMiddleware(config *conf.Config, uploadsService service.UploadsService) *AvatarMiddleware {
+func NewAvatarMiddleware(config *conf.Config, service *service.Service) *AvatarMiddleware {
 	return &AvatarMiddleware{
-		uploadsConfig:  config.Uploads,
-		uploadsService: uploadsService,
+		Service:       service,
+		uploadsConfig: config.Uploads,
 	}
 }
 
@@ -47,7 +47,7 @@ func (a *AvatarMiddleware) AvatarThumb(c *gin.Context) {
 		var err error
 		if size != 0 {
 			// 获取头像缩略图地址
-			filepath, err = a.uploadsService.AvatarThumbFile(c, filename, size)
+			filepath, err = a.UploadsService().AvatarThumbFile(c, filename, size)
 			if err != nil {
 				log.WithContext(c).Errorf("获取头像缩略图 %s 地址失败 %v", filename, err)
 				c.Abort()

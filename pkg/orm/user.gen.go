@@ -28,11 +28,11 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	tableName := _user.userDo.TableName()
 	_user.ALL = field.NewAsterisk(tableName)
 	_user.Id = field.NewInt64(tableName, "id")
-	_user.CreatedAt = field.NewTime(tableName, "created_at")
-	_user.UpdatedAt = field.NewTime(tableName, "updated_at")
-	_user.DeletedAt = field.NewField(tableName, "deleted_at")
-	_user.SuspendedAt = field.NewField(tableName, "suspended_at")
-	_user.LastLoginDate = field.NewField(tableName, "last_login_date")
+	_user.CreatedAt = field.NewInt64(tableName, "created_at")
+	_user.UpdatedAt = field.NewInt64(tableName, "updated_at")
+	_user.DeletedAt = field.NewUint(tableName, "deleted_at")
+	_user.SuspendedAt = field.NewInt64(tableName, "suspended_at")
+	_user.LastLoginDate = field.NewInt64(tableName, "last_login_date")
 	_user.Username = field.NewString(tableName, "username")
 	_user.Password = field.NewString(tableName, "password")
 	_user.Email = field.NewString(tableName, "email")
@@ -51,11 +51,11 @@ type user struct {
 
 	ALL           field.Asterisk
 	Id            field.Int64
-	CreatedAt     field.Time
-	UpdatedAt     field.Time
-	DeletedAt     field.Field
-	SuspendedAt   field.Field
-	LastLoginDate field.Field
+	CreatedAt     field.Int64
+	UpdatedAt     field.Int64
+	DeletedAt     field.Uint
+	SuspendedAt   field.Int64
+	LastLoginDate field.Int64
 	Username      field.String
 	Password      field.String
 	Email         field.String
@@ -80,11 +80,11 @@ func (u user) As(alias string) *user {
 func (u *user) updateTableName(table string) *user {
 	u.ALL = field.NewAsterisk(table)
 	u.Id = field.NewInt64(table, "id")
-	u.CreatedAt = field.NewTime(table, "created_at")
-	u.UpdatedAt = field.NewTime(table, "updated_at")
-	u.DeletedAt = field.NewField(table, "deleted_at")
-	u.SuspendedAt = field.NewField(table, "suspended_at")
-	u.LastLoginDate = field.NewField(table, "last_login_date")
+	u.CreatedAt = field.NewInt64(table, "created_at")
+	u.UpdatedAt = field.NewInt64(table, "updated_at")
+	u.DeletedAt = field.NewUint(table, "deleted_at")
+	u.SuspendedAt = field.NewInt64(table, "suspended_at")
+	u.LastLoginDate = field.NewInt64(table, "last_login_date")
 	u.Username = field.NewString(table, "username")
 	u.Password = field.NewString(table, "password")
 	u.Email = field.NewString(table, "email")

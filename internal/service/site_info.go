@@ -30,6 +30,5 @@ func (s *siteInfoService) GetSiteLogin(c context.Context) (*schema.GetSiteLoginR
 		log.WithContext(c).Errorf("获取站点登录信息失败: %v", err)
 		return nil, err
 	}
-
 	return siteInfo.Login, nil
 }

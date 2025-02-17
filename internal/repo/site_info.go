@@ -15,7 +15,7 @@ import (
 )
 
 type SiteInfoRepo interface {
-	// FirstSiteInfoByType returns the first site info of the given type.
+	// FirstSiteInfoByType 根据给定的类型从数据库或缓存中获取第一个站点信息。
 	FirstSiteInfoByType(c context.Context, typ model.SiteInfoType) (siteInfo *model.SiteInfo, err error)
 }
 

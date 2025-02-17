@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"github.com/lantonster/askme/internal/model"
 	"github.com/lantonster/askme/pkg/checker"
 	"github.com/lantonster/askme/pkg/validator"
 )
@@ -32,4 +33,4 @@ func (r *RegisterUserByEmailReq) Check() (fields []*validator.FieldError, err er
 	return nil, nil
 }
 
-type RegisterUserByEmailRes struct{}
+type RegisterUserByEmailRes = model.User

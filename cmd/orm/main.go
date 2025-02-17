@@ -13,6 +13,7 @@ func main() {
 
 	g.ApplyBasic(
 		model.SiteInfo{},
+		model.User{},
 	)
 
 	g.Execute()

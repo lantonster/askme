@@ -2,22 +2,27 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/lantonster/askme/internal/middleware"
 	"github.com/lantonster/askme/internal/schema"
 	"github.com/lantonster/askme/internal/service"
 	"github.com/lantonster/askme/pkg/errors"
 	"github.com/lantonster/askme/pkg/handler"
+	"github.com/lantonster/askme/pkg/i18n"
 	"github.com/lantonster/askme/pkg/reason"
 )
 
 type UserController struct {
 	siteInfoService service.SiteInfoService
+	userService     service.UserService
 }
 
 func NewUserController(
 	siteInfoService service.SiteInfoService,
+	userService service.UserService,
 ) *UserController {
 	return &UserController{
 		siteInfoService: siteInfoService,
+		userService:     userService,
 	}
 }
 
@@ -32,12 +37,12 @@ func NewUserController(
 //	@Success		200		{object}	handler.ResponseBody{data=schema.RegisterUserByEmailRes}	"success"
 //	@Router			/askme/api/v1/user/register/email [post]
 func (uc *UserController) RegisterUserByEmail(c *gin.Context) {
-	siteInfo, err := uc.siteInfoService.GetSiteLogin(c)
+	loginInfo, err := uc.siteInfoService.GetSiteLogin(c)
 	if err != nil {
 		handler.Response(c, err, nil)
 		return
 	}
-	if !siteInfo.AllowNewRegistrations || !siteInfo.AllowEmailRegistrations {
+	if !loginInfo.AllowNewRegistrations || !loginInfo.AllowEmailRegistrations {
 		handler.Response(c, errors.BadRequest(reason.UserRegistrationNotAllowed), nil)
 		return
 	}
@@ -45,5 +50,24 @@ func (uc *UserController) RegisterUserByEmail(c *gin.Context) {
 	req := &schema.RegisterUserByEmailReq{}
 	if handler.BindAndCheck(c, req) {
 		return
+	}
+	if !loginInfo.IsEmailAllowed(req.Email) {
+		handler.Response(c, errors.BadRequest(reason.EmailIllegalDomainError), nil)
+		return
+	}
+
+	req.IP = c.ClientIP()
+	if !middleware.GetUserIsAdminModerator(c) {
+		// TODO
+	}
+
+	res, fieldErr, err := uc.userService.RegisterUserByEmail(c, req)
+	if len(fieldErr) > 0 {
+		for _, field := range fieldErr {
+			field.Error = i18n.Tr(handler.GetLang(c), field.Error)
+		}
+		handler.Response(c, err, fieldErr)
+	} else {
+		handler.Response(c, err, res)
 	}
 }

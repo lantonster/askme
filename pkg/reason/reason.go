@@ -24,6 +24,9 @@ const (
 )
 
 const (
+	// 配置不存在
+	ConfigNotFound = "error.config.not_found"
+
 	// 邮箱域名不合法
 	EmailIllegalDomainError = "error.email.illegal_email_domain_error"
 

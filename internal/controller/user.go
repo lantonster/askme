@@ -7,7 +7,6 @@ import (
 	"github.com/lantonster/askme/internal/service"
 	"github.com/lantonster/askme/pkg/errors"
 	"github.com/lantonster/askme/pkg/handler"
-	"github.com/lantonster/askme/pkg/i18n"
 	"github.com/lantonster/askme/pkg/reason"
 )
 
@@ -56,9 +55,6 @@ func (uc *UserController) RegisterUserByEmail(c *gin.Context) {
 
 	res, fieldErr, err := uc.UserService().RegisterUserByEmail(c, req)
 	if len(fieldErr) > 0 {
-		for _, field := range fieldErr {
-			field.Error = i18n.Tr(handler.GetLang(c), field.Error)
-		}
 		handler.Response(c, err, fieldErr)
 	} else {
 		handler.Response(c, err, res)

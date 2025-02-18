@@ -18,15 +18,15 @@ type SiteInfoService interface {
 }
 
 type SiteInfoServiceImpl struct {
-	repo *repo.Repo
+	*repo.Repo
 }
 
 func NewSiteInfoService(repo *repo.Repo) SiteInfoService {
-	return &SiteInfoServiceImpl{repo: repo}
+	return &SiteInfoServiceImpl{Repo: repo}
 }
 
 func (s *SiteInfoServiceImpl) GetSiteGeneral(c context.Context) (*schema.GetSiteGeneralRes, error) {
-	siteInfo, err := s.repo.SiteInfo.FirstSiteInfoByType(c, model.SiteInfoTypeGeneral)
+	siteInfo, err := s.SiteInfoRepo.FirstSiteInfoByType(c, model.SiteInfoTypeGeneral)
 	if err != nil {
 		log.WithContext(c).Errorf("获取站点常规信息失败: %v", err)
 		return nil, err
@@ -35,7 +35,7 @@ func (s *SiteInfoServiceImpl) GetSiteGeneral(c context.Context) (*schema.GetSite
 }
 
 func (s *SiteInfoServiceImpl) GetSiteLogin(c context.Context) (*schema.GetSiteLoginRes, error) {
-	siteInfo, err := s.repo.SiteInfo.FirstSiteInfoByType(c, model.SiteInfoTypeLogin)
+	siteInfo, err := s.SiteInfoRepo.FirstSiteInfoByType(c, model.SiteInfoTypeLogin)
 	if err != nil {
 		log.WithContext(c).Errorf("获取站点登录信息失败: %v", err)
 		return nil, err

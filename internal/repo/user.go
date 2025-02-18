@@ -31,13 +31,11 @@ type UserRepo interface {
 }
 
 type userRepo struct {
-	data *data.Data
+	*data.Data
 }
 
 func NewUserRepo(data *data.Data) UserRepo {
-	return &userRepo{
-		data: data,
-	}
+	return &userRepo{Data: data}
 }
 
 // CreateUser 函数用于在数据库中创建新用户。

@@ -20,13 +20,11 @@ type SiteInfoRepo interface {
 }
 
 type siteInfoRepo struct {
-	data *data.Data
+	*data.Data
 }
 
 func NewSiteInfoRepo(data *data.Data) SiteInfoRepo {
-	return &siteInfoRepo{
-		data: data,
-	}
+	return &siteInfoRepo{Data: data}
 }
 
 // FirstSiteInfoByType 根据给定的类型从数据库或缓存中获取第一个站点信息。
@@ -44,7 +42,7 @@ func (r *siteInfoRepo) FirstSiteInfoByType(c context.Context, typ model.SiteInfo
 
 	key := fmt.Sprintf(constant.CacheKeySiteInfo, typ)
 	// 尝试从缓存中获取站点信息，如果在缓存中获取成功，直接返回
-	if exist, _ := r.data.Cache.GetObj(c, key, siteInfo); exist {
+	if exist, _ := r.Cache.GetObj(c, key, siteInfo); exist {
 		return siteInfo, nil
 	}
 
@@ -59,7 +57,7 @@ func (r *siteInfoRepo) FirstSiteInfoByType(c context.Context, typ model.SiteInfo
 	}
 
 	// 将站点信息设置到缓存中，发生错误只记录不返回
-	if err := r.data.Cache.SetObj(c, key, siteInfo, constant.CacheTimeSiteInfo); err != nil {
+	if err := r.Cache.SetObj(c, key, siteInfo, constant.CacheTimeSiteInfo); err != nil {
 		log.WithContext(c).Errorf("cache set obj [%s] error: %s", key, err)
 	}
 	return siteInfo, nil

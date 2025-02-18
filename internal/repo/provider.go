@@ -3,22 +3,30 @@ package repo
 import "github.com/google/wire"
 
 type Repo struct {
-	SiteInfo SiteInfoRepo
-	User     UserRepo
+	ConfigRepo   ConfigRepo
+	EmailRepo    EmailRepo
+	SiteInfoRepo SiteInfoRepo
+	UserRepo     UserRepo
 }
 
 func NewRepo(
-	siteInfo SiteInfoRepo,
-	user UserRepo,
+	configRepo ConfigRepo,
+	emailRepo EmailRepo,
+	siteInfoRepo SiteInfoRepo,
+	userRepo UserRepo,
 ) *Repo {
 	return &Repo{
-		SiteInfo: siteInfo,
-		User:     user,
+		ConfigRepo:   configRepo,
+		EmailRepo:    emailRepo,
+		SiteInfoRepo: siteInfoRepo,
+		UserRepo:     userRepo,
 	}
 }
 
 var ProviderSet = wire.NewSet(
 	NewRepo,
+	NewConfigRepo,
+	NewEmailRepo,
 	NewSiteInfoRepo,
 	NewUserRepo,
 )

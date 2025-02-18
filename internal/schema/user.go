@@ -33,4 +33,10 @@ func (r *RegisterUserByEmailReq) Check() (fields []*validator.FieldError, err er
 	return nil, nil
 }
 
-type RegisterUserByEmailRes = model.User
+type RegisterUserByEmailRes struct {
+	model.User
+
+	RoleId      int64  `json:"role_id"`
+	AccessToken string `json:"access_token"`
+	VisitToken  string `json:"visit_token"`
+}

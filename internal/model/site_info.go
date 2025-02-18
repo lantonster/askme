@@ -33,6 +33,7 @@ type SiteInfo struct {
 
 	Genral *SiteInfoGeneral `json:"general" gorm:"-"`
 	Login  *SiteInfoLogin   `json:"login" gorm:"-"`
+	Users  *SiteInfoUsers   `json:"users" gorm:"-"`
 }
 
 func (*SiteInfo) TableName() string {
@@ -49,6 +50,10 @@ func (si *SiteInfo) AfterFind(tx *gorm.DB) (err error) {
 	case string(SiteInfoTypeLogin):
 		si.Login = &SiteInfoLogin{}
 		json.Unmarshal([]byte(si.Content), si.Login)
+
+	case string(SiteInfoTypeUsers):
+		si.Users = &SiteInfoUsers{}
+		json.Unmarshal([]byte(si.Content), si.Users)
 
 	}
 
@@ -89,4 +94,15 @@ func (login *SiteInfoLogin) IsEmailAllowed(email string) bool {
 		}
 	}
 	return false
+}
+
+type SiteInfoUsers struct {
+	AllowUpdateAvatar      bool   `json:"allow_update_avatar"`
+	AllowUpdateBio         bool   `json:"allow_update_bio"`
+	AllowUpdateDisplayName bool   `json:"allow_update_display_name"`
+	AllowUpdateLocation    bool   `json:"allow_update_location"`
+	AllowUpdateUsername    bool   `json:"allow_update_username"`
+	AllowUpdateWebsite     bool   `json:"allow_update_website"`
+	DefaultAvatar          string `json:"default_avatar"`
+	GravatarBaseURL        string `json:"gravatar_base_url"`
 }

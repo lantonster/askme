@@ -18,6 +18,7 @@ import (
 var (
 	Q        = new(Query)
 	Config   *config
+	Role     *role
 	SiteInfo *siteInfo
 	User     *user
 )
@@ -25,6 +26,7 @@ var (
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
 	Config = &Q.Config
+	Role = &Q.Role
 	SiteInfo = &Q.SiteInfo
 	User = &Q.User
 }
@@ -33,6 +35,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:       db,
 		Config:   newConfig(db, opts...),
+		Role:     newRole(db, opts...),
 		SiteInfo: newSiteInfo(db, opts...),
 		User:     newUser(db, opts...),
 	}
@@ -42,6 +45,7 @@ type Query struct {
 	db *gorm.DB
 
 	Config   config
+	Role     role
 	SiteInfo siteInfo
 	User     user
 }
@@ -52,6 +56,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:       db,
 		Config:   q.Config.clone(db),
+		Role:     q.Role.clone(db),
 		SiteInfo: q.SiteInfo.clone(db),
 		User:     q.User.clone(db),
 	}
@@ -69,6 +74,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:       db,
 		Config:   q.Config.replaceDB(db),
+		Role:     q.Role.replaceDB(db),
 		SiteInfo: q.SiteInfo.replaceDB(db),
 		User:     q.User.replaceDB(db),
 	}
@@ -76,6 +82,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 
 type queryCtx struct {
 	Config   *configDo
+	Role     *roleDo
 	SiteInfo *siteInfoDo
 	User     *userDo
 }
@@ -83,6 +90,7 @@ type queryCtx struct {
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
 		Config:   q.Config.WithContext(ctx),
+		Role:     q.Role.WithContext(ctx),
 		SiteInfo: q.SiteInfo.WithContext(ctx),
 		User:     q.User.WithContext(ctx),
 	}

@@ -15,6 +15,9 @@ type SiteInfoService interface {
 
 	// GetSiteLogin 获取站点登录信息
 	GetSiteLogin(c context.Context) (*schema.GetSiteLoginRes, error)
+
+	// GetSiteUsers 获取站点用户信息
+	GetSiteUsers(c context.Context) (*schema.GetSiteUsersRes, error)
 }
 
 type SiteInfoServiceImpl struct {
@@ -41,4 +44,13 @@ func (s *SiteInfoServiceImpl) GetSiteLogin(c context.Context) (*schema.GetSiteLo
 		return nil, err
 	}
 	return siteInfo.Login, nil
+}
+
+func (s *SiteInfoServiceImpl) GetSiteUsers(c context.Context) (*schema.GetSiteUsersRes, error) {
+	siteInfo, err := s.SiteInfoRepo.FirstSiteInfoByType(c, model.SiteInfoTypeUsers)
+	if err != nil {
+		log.WithContext(c).Errorf("获取站点用户信息失败: %v", err)
+		return nil, err
+	}
+	return siteInfo.Users, nil
 }

@@ -1,6 +1,9 @@
 package model
 
 import (
+	"encoding/json"
+
+	"github.com/lantonster/askme/pkg/gravatar"
 	"gorm.io/gorm"
 	"gorm.io/plugin/soft_delete"
 )
@@ -39,6 +42,7 @@ type User struct {
 	IP          string // IP 地址
 	Status      string // 用户状态
 	MailStatus  string // 邮箱状态
+	Avatar      string // 头像
 }
 
 func (User) TableName() string {
@@ -50,5 +54,41 @@ func (u *User) AfterFind(tx *gorm.DB) error {
 	if u.MailStatus == EmailStatusToBeVerified {
 		u.Status = UserStatusInactive
 	}
+
+	avatar := &AvatarInfo{}
+	json.Unmarshal([]byte(u.Avatar), avatar)
+
+	// 如果用户被删除，将用户头像设置为空
+	if u.Status == UserStatusDeleted {
+		u.Avatar = ""
+	}
+	switch avatar.Type {
+	case AvatarTypeGravatar:
+		u.Avatar = gravatar.GetAvatarURL(DefaultGravatarBaseURL, u.Email)
+	case AvatarTypeCustom:
+		u.Avatar = avatar.Custom
+	default:
+		u.Avatar = ""
+	}
+
 	return nil
+}
+
+const (
+	// 默认头像配置
+	DefaultGravatarBaseURL = "https://www.gravatar.com/avatar/"
+	// 默认头像
+	DefaultAvatar = "system"
+	// 默认头像类型
+	AvatarTypeDefault = "default"
+	// Gravatar 头像
+	AvatarTypeGravatar = "gravatar"
+	// 自定义头像
+	AvatarTypeCustom = "custom"
+)
+
+type AvatarInfo struct {
+	Type     string `json:"type"`
+	Gravatar string `json:"gravatar"`
+	Custom   string `json:"custom"`
 }

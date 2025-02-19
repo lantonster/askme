@@ -29,6 +29,9 @@ type UserRepo interface {
 	// GenerateUniqueUsername 将给定的用户名处理为唯一的有效用户名。
 	GenerateUniqueUsername(c context.Context, username string) (string, error)
 
+	// IncrRank 用于增加用户的积分。
+	IncrRank(c context.Context, userId, currentRank, deltaRank int64) error
+
 	// UpdateEmailStatus 更新用户的邮箱状态
 	UpdateEmailStatus(c context.Context, userId int64, emailStatus string) error
 }
@@ -148,6 +151,34 @@ func (r *userRepo) GenerateUniqueUsername(c context.Context, username string) (s
 
 		suffix = random.UsernameSuffix()
 	}
+}
+
+// IncrRank 增加用户的积分。
+//
+// 参数:
+//   - c: 上下文
+//   - userId: 用户 ID
+//   - currentRank: 当前排名值
+//   - deltaRank: 排名增加值
+//
+// 返回: 可能返回的错误，如果没有错误则返回 nil
+func (r *userRepo) IncrRank(c context.Context, userId, currentRank, deltaRank int64) error {
+	// 如果积分增加值为 0，直接返回
+	if deltaRank == 0 {
+		return nil
+	}
+
+	// 如果积分加值为负且会导致排名小于 1，调整增加值
+	if deltaRank < 0 && currentRank+deltaRank < 1 {
+		deltaRank = 1 - currentRank
+	}
+
+	// 执行数据库更新操作，如果出错则返回相应错误
+	_, err := orm.Q.User.WithContext(c).Where(orm.Q.User.Id.Eq(userId)).UpdateSimple(orm.Q.User.Rank.Add(deltaRank))
+	if err != nil {
+		return errors.InternalServer(reason.DatabaseError).WithError(err).WithStack()
+	}
+	return nil
 }
 
 // UpdateEmailStatus 更新用户的邮箱状态

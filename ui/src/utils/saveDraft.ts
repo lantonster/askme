@@ -58,7 +58,6 @@ class SaveDraft {
   }
 
   save = debounce((data: DraftParams) => {
-    // TODO
     if (this.status === 'remove') {
       return;
     }

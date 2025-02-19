@@ -15,18 +15,17 @@ definitions:
     type: object
   schema.RegisterUserByEmailReq:
     properties:
-      captcha_code:
-        type: string
-      captcha_id:
-        type: string
       e_mail:
+        description: 邮箱
         maxLength: 500
         type: string
       name:
+        description: 用户名
         maxLength: 30
         minLength: 2
         type: string
       pass:
+        description: 密码
         maxLength: 32
         minLength: 8
         type: string
@@ -38,6 +37,7 @@ definitions:
   schema.RegisterUserByEmailRes:
     properties:
       access_token:
+        description: 访问令牌
         type: string
       avatar:
         description: 头像
@@ -54,7 +54,7 @@ definitions:
         type: string
       id:
         type: integer
-      ip:
+      ipInfo:
         description: IP 地址
         type: string
       lastLoginDate:
@@ -67,6 +67,7 @@ definitions:
         description: 密码
         type: string
       role_id:
+        description: 角色 ID
         type: integer
       status:
         description: 用户状态
@@ -80,11 +81,67 @@ definitions:
         description: 用户名
         type: string
       visit_token:
+        description: 访问令牌
         type: string
     type: object
-  schema.VerificationEmailReq:
+  schema.VerifyEmailReq:
+    properties:
+      code:
+        description: 验证码
+        maxLength: 500
+        type: string
+    required:
+    - code
     type: object
-  schema.VerificationEmailRes:
+  schema.VerifyEmailRes:
+    properties:
+      access_token:
+        description: 访问令牌
+        type: string
+      avatar:
+        description: 头像
+        type: string
+      createdAt:
+        type: integer
+      deletedAt:
+        type: integer
+      displayName:
+        description: 昵称
+        type: string
+      email:
+        description: 邮箱
+        type: string
+      id:
+        type: integer
+      ipInfo:
+        description: IP 地址
+        type: string
+      lastLoginDate:
+        description: 上次登录时间
+        type: integer
+      mailStatus:
+        description: 邮箱状态
+        type: string
+      password:
+        description: 密码
+        type: string
+      role_id:
+        description: 角色 ID
+        type: integer
+      status:
+        description: 用户状态
+        type: string
+      suspendedAt:
+        description: 被禁言的时间
+        type: integer
+      updatedAt:
+        type: integer
+      username:
+        description: 用户名
+        type: string
+      visit_token:
+        description: 访问令牌
+        type: string
     type: object
 info:
   contact: {}
@@ -100,7 +157,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/schema.VerificationEmailReq'
+          $ref: '#/definitions/schema.VerifyEmailReq'
       produces:
       - application/json
       responses:
@@ -111,7 +168,7 @@ paths:
             - $ref: '#/definitions/handler.ResponseBody'
             - properties:
                 data:
-                  $ref: '#/definitions/schema.VerificationEmailRes'
+                  $ref: '#/definitions/schema.VerifyEmailRes'
               type: object
       summary: 邮箱验证
       tags:

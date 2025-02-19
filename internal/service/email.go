@@ -59,7 +59,7 @@ func (s *EmailServiceImpl) Send(c context.Context, email, subject, body string) 
 	log.WithContext(c).Infof("尝试发送邮件到 %s", email)
 
 	// 获取邮件配置
-	config, err := configService.GetConfigEmail(c)
+	config, err := configService.GetEmail(c)
 	if err != nil {
 		log.WithContext(c).Errorf("获取邮件配置失败: %v", err)
 		return err

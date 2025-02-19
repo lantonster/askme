@@ -148,7 +148,10 @@ func (s *UserServiceImpl) VerifyEmail(c context.Context, req *schema.VerifyEmail
 		return nil, err
 	}
 
-	// TODO activity
+	if err := activityService.ActivateUser(c, user); err != nil {
+		log.WithContext(c).Errorf("用户 [%d] 激活创建活动发生错误: %v", user.Id, err)
+		return nil, err
+	}
 
 	// TODO three-party login
 

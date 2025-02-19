@@ -7,12 +7,10 @@ import (
 )
 
 type RegisterUserByEmailReq struct {
-	Name        string `validate:"required,gte=2,lte=30" json:"name"`          // 用户名
-	Email       string `validate:"required,email,gt=0,lte=500" json:"e_mail" ` // 邮箱
-	Pass        string `validate:"required,gte=8,lte=32" json:"pass"`          // 密码
-	CaptchaID   string `json:"captcha_id"`                                     // 验证码 id
-	CaptchaCode string `json:"captcha_code"`                                   // 验证码
-	IP          string `json:"-" `                                             // IP 地址
+	Name  string `validate:"required,gte=2,lte=30" json:"name"`          // 用户名
+	Email string `validate:"required,email,gt=0,lte=500" json:"e_mail" ` // 邮箱
+	Pass  string `validate:"required,gte=8,lte=32" json:"pass"`          // 密码
+	IP    string `json:"-" `                                             // IP 地址
 }
 
 // Check 方法用于检查 `RegisterUserByEmailReq` 中密码的有效性。

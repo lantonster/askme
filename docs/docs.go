@@ -35,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/schema.VerificationEmailReq"
+                            "$ref": "#/definitions/schema.VerifyEmailReq"
                         }
                     }
                 ],
@@ -51,7 +51,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/schema.VerificationEmailRes"
+                                            "$ref": "#/definitions/schema.VerifyEmailRes"
                                         }
                                     }
                                 }
@@ -137,22 +137,19 @@ const docTemplate = `{
                 "pass"
             ],
             "properties": {
-                "captcha_code": {
-                    "type": "string"
-                },
-                "captcha_id": {
-                    "type": "string"
-                },
                 "e_mail": {
+                    "description": "邮箱",
                     "type": "string",
                     "maxLength": 500
                 },
                 "name": {
+                    "description": "用户名",
                     "type": "string",
                     "maxLength": 30,
                     "minLength": 2
                 },
                 "pass": {
+                    "description": "密码",
                     "type": "string",
                     "maxLength": 32,
                     "minLength": 8
@@ -163,6 +160,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "access_token": {
+                    "description": "访问令牌",
                     "type": "string"
                 },
                 "avatar": {
@@ -186,7 +184,7 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "ip": {
+                "ipInfo": {
                     "description": "IP 地址",
                     "type": "string"
                 },
@@ -203,6 +201,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role_id": {
+                    "description": "角色 ID",
                     "type": "integer"
                 },
                 "status": {
@@ -221,15 +220,92 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "visit_token": {
+                    "description": "访问令牌",
                     "type": "string"
                 }
             }
         },
-        "schema.VerificationEmailReq": {
-            "type": "object"
+        "schema.VerifyEmailReq": {
+            "type": "object",
+            "required": [
+                "code"
+            ],
+            "properties": {
+                "code": {
+                    "description": "验证码",
+                    "type": "string",
+                    "maxLength": 500
+                }
+            }
         },
-        "schema.VerificationEmailRes": {
-            "type": "object"
+        "schema.VerifyEmailRes": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "description": "访问令牌",
+                    "type": "string"
+                },
+                "avatar": {
+                    "description": "头像",
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "integer"
+                },
+                "deletedAt": {
+                    "type": "integer"
+                },
+                "displayName": {
+                    "description": "昵称",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "邮箱",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ipInfo": {
+                    "description": "IP 地址",
+                    "type": "string"
+                },
+                "lastLoginDate": {
+                    "description": "上次登录时间",
+                    "type": "integer"
+                },
+                "mailStatus": {
+                    "description": "邮箱状态",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                },
+                "role_id": {
+                    "description": "角色 ID",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "用户状态",
+                    "type": "string"
+                },
+                "suspendedAt": {
+                    "description": "被禁言的时间",
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "integer"
+                },
+                "username": {
+                    "description": "用户名",
+                    "type": "string"
+                },
+                "visit_token": {
+                    "description": "访问令牌",
+                    "type": "string"
+                }
+            }
         }
     }
 }`

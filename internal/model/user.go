@@ -43,6 +43,7 @@ type User struct {
 	Status      string // 用户状态
 	MailStatus  string // 邮箱状态
 	Avatar      string // 头像
+	Rank        int64 
 }
 
 func (User) TableName() string {

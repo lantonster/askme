@@ -12,6 +12,7 @@ func main() {
 	})
 
 	g.ApplyBasic(
+		model.Activity{},
 		model.Config{},
 		model.Role{},
 		model.SiteInfo{},

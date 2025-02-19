@@ -6,6 +6,7 @@ import (
 
 var ProviderSet = wire.NewSet(
 	NewService,
+	NewActivityService,
 	NewAuthService,
 	NewConfigService,
 	NewEmailService,
@@ -15,6 +16,7 @@ var ProviderSet = wire.NewSet(
 )
 
 var (
+	activityService ActivityService
 	authService     AuthService
 	configService   ConfigService
 	emailService    EmailService
@@ -26,6 +28,7 @@ var (
 type Service struct{}
 
 func NewService(
+	activity ActivityService,
 	auth AuthService,
 	config ConfigService,
 	email EmailService,
@@ -33,6 +36,7 @@ func NewService(
 	uploads UploadsService,
 	user UserService,
 ) *Service {
+	activityService = activity
 	authService = auth
 	configService = config
 	emailService = email
@@ -41,6 +45,10 @@ func NewService(
 	userService = user
 
 	return &Service{}
+}
+
+func (s *Service) ActivityService() ActivityService {
+	return activityService
 }
 
 func (s *Service) Auth() AuthService {

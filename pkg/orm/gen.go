@@ -17,6 +17,7 @@ import (
 
 var (
 	Q        = new(Query)
+	Activity *activity
 	Config   *config
 	Role     *role
 	SiteInfo *siteInfo
@@ -25,6 +26,7 @@ var (
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
+	Activity = &Q.Activity
 	Config = &Q.Config
 	Role = &Q.Role
 	SiteInfo = &Q.SiteInfo
@@ -34,6 +36,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:       db,
+		Activity: newActivity(db, opts...),
 		Config:   newConfig(db, opts...),
 		Role:     newRole(db, opts...),
 		SiteInfo: newSiteInfo(db, opts...),
@@ -44,6 +47,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 type Query struct {
 	db *gorm.DB
 
+	Activity activity
 	Config   config
 	Role     role
 	SiteInfo siteInfo
@@ -55,6 +59,7 @@ func (q *Query) Available() bool { return q.db != nil }
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:       db,
+		Activity: q.Activity.clone(db),
 		Config:   q.Config.clone(db),
 		Role:     q.Role.clone(db),
 		SiteInfo: q.SiteInfo.clone(db),
@@ -73,6 +78,7 @@ func (q *Query) WriteDB() *Query {
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:       db,
+		Activity: q.Activity.replaceDB(db),
 		Config:   q.Config.replaceDB(db),
 		Role:     q.Role.replaceDB(db),
 		SiteInfo: q.SiteInfo.replaceDB(db),
@@ -81,6 +87,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 }
 
 type queryCtx struct {
+	Activity *activityDo
 	Config   *configDo
 	Role     *roleDo
 	SiteInfo *siteInfoDo
@@ -89,6 +96,7 @@ type queryCtx struct {
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
+		Activity: q.Activity.WithContext(ctx),
 		Config:   q.Config.WithContext(ctx),
 		Role:     q.Role.WithContext(ctx),
 		SiteInfo: q.SiteInfo.WithContext(ctx),

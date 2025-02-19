@@ -9,8 +9,8 @@ import (
 )
 
 type ConfigService interface {
-	// GetConfigEmail 获取邮箱配置
-	GetConfigEmail(c context.Context) (*model.ConfigEmail, error)
+	// GetEmail 获取邮箱配置
+	GetEmail(c context.Context) (*model.ConfigEmail, error)
 }
 
 type ConfigServiceImpl struct {
@@ -21,7 +21,7 @@ func NewConfigService(repo *repo.Repo) ConfigService {
 	return &ConfigServiceImpl{Repo: repo}
 }
 
-func (s *ConfigServiceImpl) GetConfigEmail(c context.Context) (*model.ConfigEmail, error) {
+func (s *ConfigServiceImpl) GetEmail(c context.Context) (*model.ConfigEmail, error) {
 	config, err := s.ConfigRepo.FirstConfigByKey(c, model.ConfigKeyEmail)
 	if err != nil {
 		log.WithContext(c).Errorf("获取邮箱配置失败: %v", err)

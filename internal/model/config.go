@@ -2,12 +2,15 @@ package model
 
 import (
 	"encoding/json"
+	"strings"
 
+	"github.com/spf13/cast"
 	"gorm.io/gorm"
 )
 
 const (
-	ConfigKeyEmail = "email"
+	ConfigKeyEmail         = "email"
+	ConfigKeyUserActivated = "user.activated"
 )
 
 // Config [MySQL / Redis] 配置
@@ -16,7 +19,8 @@ type Config struct {
 	Key   string
 	Value string
 
-	Email *ConfigEmail `gorm:"-"`
+	Email         *ConfigEmail `gorm:"-"` // 邮件配置
+	UserActivated int64        `gorm:"-"` // 用户激活
 }
 
 func (Config) TableName() string {
@@ -29,6 +33,9 @@ func (c *Config) AfterFind(tx *gorm.DB) error {
 	case ConfigKeyEmail:
 		c.Email = &ConfigEmail{}
 		json.Unmarshal([]byte(c.Value), c.Email)
+
+	case ConfigKeyUserActivated:
+		c.UserActivated = cast.ToInt64(c.Value)
 
 	}
 	return nil
@@ -58,9 +65,5 @@ type ConfigEmail struct {
 }
 
 func (c *ConfigEmail) IsSSL() bool {
-	return c.Encryption == "SSL"
-}
-
-func (c *ConfigEmail) IsTLS() bool {
-	return c.Encryption == "TLS"
+	return strings.ToLower(c.Encryption) == "ssl"
 }

@@ -1,3 +1,6 @@
+.PHONY: pre
+pre: ui orm swag wire
+
 .PHONY: run
 run:
 	go run .
@@ -13,3 +16,7 @@ orm:
 .PHONY: swag
 swag:
 	swag fmt && swag init --parseDependency
+
+.PHONY: wire
+wire:
+	wire gen cmd/wire/wire.go

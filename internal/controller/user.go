@@ -24,8 +24,8 @@ func NewUserController(service *service.Service) *UserController {
 //	@Tags			User
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		schema.VerificationEmailReq								true	"body"
-//	@Success		200		{object}	handler.ResponseBody{data=schema.VerificationEmailRes}	"success"
+//	@Param			body	body		schema.VerifyEmailReq								true	"body"
+//	@Success		200		{object}	handler.ResponseBody{data=schema.VerifyEmailRes}	"success"
 //	@Router			/askme/api/v1/user/email/verification [post]
 func (ctrl *UserController) VerifyEmail(c *gin.Context) {
 	req := &schema.VerifyEmailReq{}
@@ -45,7 +45,6 @@ func (ctrl *UserController) VerifyEmail(c *gin.Context) {
 		return
 	}
 
-	// TODO action del
 	handler.Response(c, nil, resp)
 }
 

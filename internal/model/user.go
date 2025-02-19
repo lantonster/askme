@@ -39,7 +39,7 @@ type User struct {
 	Password    string // 密码
 	Email       string // 邮箱
 	DisplayName string // 昵称
-	IP          string // IP 地址
+	IpInfo      string // IP 地址
 	Status      string // 用户状态
 	MailStatus  string // 邮箱状态
 	Avatar      string // 头像

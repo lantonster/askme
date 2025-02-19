@@ -6,6 +6,8 @@ import (
 )
 
 type Cache interface {
+	Del(c context.Context, key string) error
+
 	// SetObj 函数将对象存储到缓存中。
 	SetObj(c context.Context, key string, obj any, ttl time.Duration) (err error)
 

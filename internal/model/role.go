@@ -1,6 +1,10 @@
 package model
 
-const RoleIdUser = iota + 1
+const (
+	RoleIdUser = iota + 1
+	RoleIdAdminID
+	RoleIdModeratorID
+)
 
 type Role struct {
 	Id          int64

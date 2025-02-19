@@ -172,7 +172,7 @@ export const replacementPassword = (params: Type.PasswordReplaceReq) => {
 };
 
 export const activateAccount = (code: string) => {
-  return request.post(`/answer/api/v1/user/email/verification`, { code });
+  return request.post(`/askme/api/v1/user/email/verification`, { code });
 };
 
 export const checkImgCode = (k: Type.CaptchaKey) => {

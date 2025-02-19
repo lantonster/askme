@@ -24,6 +24,10 @@ func (r *AskMeRouter) RegisterNoAuth(router *gin.RouterGroup) {
 
 	user := router.Group("/user")
 	{
+		// 邮箱确认
+		user.POST("/email/verification", r.userController.VerifyEmail)
+
+		// 邮箱注册
 		user.POST("/register/email", r.userController.RegisterUserByEmail)
 	}
 

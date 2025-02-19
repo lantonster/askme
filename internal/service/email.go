@@ -24,6 +24,9 @@ type EmailService interface {
 
 	// SendRegisterVerificationEmail 发送注册验证邮件
 	SendRegisterVerificationEmail(c context.Context, userId int64, email string) error
+
+	// VerifyUrlExpired 验证 URL 是否过期。
+	VerifyUrlExpired(c context.Context, code string) (*model.VerificationEmail, *schema.ForbiddenRes, error)
 }
 
 type EmailServiceImpl struct {
@@ -117,7 +120,7 @@ func (s *EmailServiceImpl) SendRegisterVerificationEmail(c context.Context, user
 	// 翻译并获取注册邮件标题和正文
 	title := i18n.TrWithData(lang, constant.EmailTplKeyRegisterTitle, template)
 	body := i18n.TrWithData(lang, constant.EmailTplKeyRegisterBody, template)
-	verification := &model.VerificationEmail{Email: email, UserID: userId}
+	verification := &model.VerificationEmail{Email: email, UserId: userId}
 
 	// 存储邮件验证码，如果存储失败则记录错误并返回
 	if err := s.EmailRepo.StoreVerificationEmail(c, userId, code, verification, constant.CacheTimeVerificationEmail); err != nil {
@@ -132,4 +135,28 @@ func (s *EmailServiceImpl) SendRegisterVerificationEmail(c context.Context, user
 	}
 
 	return nil
+}
+
+// VerifyUrlExpired 验证 URL 是否过期。
+//
+// 参数:
+//   - c: 上下文
+//   - code: 验证码
+//
+// 返回:
+//   - *model.VerificationEmail: 验证邮件信息，如果验证成功则不为 nil
+//   - *schema.ForbiddenRes: 禁止响应，如果验证码过期则不为 nil
+//   - error: 可能返回的错误
+func (s *EmailServiceImpl) VerifyUrlExpired(c context.Context, code string) (*model.VerificationEmail, *schema.ForbiddenRes, error) {
+	// 调用 EmailRepo 的 VerifyCode 方法进行验证码验证
+	email, success, err := s.EmailRepo.VerifyCode(c, code)
+	if err != nil {
+		log.WithContext(c).Errorf("验证邮件验证码失败: %v", err)
+		return nil, nil, err
+	} else if !success {
+		log.WithContext(c).Infof("邮件验证码 [%s] 已过期", code)
+		return nil, &schema.ForbiddenRes{Type: schema.ForbiddenReasonTypeURLExpired}, errors.Forbidden(reason.EmailVerifyURLExpired)
+	}
+
+	return email, nil, nil
 }

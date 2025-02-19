@@ -25,7 +25,12 @@ func NewCache(conn, username, password string) *Cache {
 	return &Cache{Client: client}
 }
 
-// SetObj 函数将对象存储到缓存中。
+// Del 从缓存中删除键。
+func (r *Cache) Del(c context.Context, key string) error {
+	return r.Client.Del(c, key).Err()
+}
+
+// SetObj 将对象存储到缓存中。
 //
 // 参数:
 //   - c: 上下文
@@ -43,7 +48,7 @@ func (r *Cache) SetObj(c context.Context, key string, obj any, ttl time.Duration
 	return r.Client.Set(c, key, string(bytes), ttl).Err()
 }
 
-// GetObj 函数从缓存中获取对象。
+// GetObj 从缓存中获取对象。
 //
 // 参数:
 //   - c: 上下文
@@ -67,10 +72,12 @@ func (r *Cache) GetObj(c context.Context, key string, obj any) (exist bool, err 
 	return true, nil
 }
 
+// SetString 将字符串存储到缓存中。
 func (r *Cache) SetString(c context.Context, key string, value string, ttl time.Duration) (err error) {
 	return r.Client.Set(c, key, value, ttl).Err()
 }
 
+// GetString 从缓存中获取字符串。
 func (r *Cache) GetString(c context.Context, key string) (value string, exist bool, err error) {
 	data, err := r.Client.Get(c, key).Result()
 	if err == redis.Nil {

@@ -28,6 +28,9 @@ type UserRepo interface {
 
 	// GenerateUniqueUsername 将给定的用户名处理为唯一的有效用户名。
 	GenerateUniqueUsername(c context.Context, username string) (string, error)
+
+	// UpdateEmailStatus 更新用户的邮箱状态
+	UpdateEmailStatus(c context.Context, userId int64, emailStatus string) error
 }
 
 type userRepo struct {
@@ -145,4 +148,13 @@ func (r *userRepo) GenerateUniqueUsername(c context.Context, username string) (s
 
 		suffix = random.UsernameSuffix()
 	}
+}
+
+// UpdateEmailStatus 更新用户的邮箱状态
+func (r *userRepo) UpdateEmailStatus(c context.Context, userId int64, emailStatus string) error {
+	_, err := orm.Q.User.WithContext(c).Where(orm.Q.User.Id.Eq(userId)).UpdateSimple(orm.Q.User.MailStatus.Value(emailStatus))
+	if err != nil {
+		return errors.InternalServer(reason.DatabaseError).WithError(err).WithStack()
+	}
+	return nil
 }

@@ -30,6 +30,9 @@ const (
 	// 邮箱域名不合法
 	EmailIllegalDomainError = "error.email.illegal_email_domain_error"
 
+	// 邮箱验证链接已过期
+	EmailVerifyURLExpired = "error.email.verify_url_expired"
+
 	// 密码不允许包含空格
 	PasswordCannotContainSpaces = "error.password.space_invalid"
 

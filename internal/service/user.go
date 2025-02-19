@@ -20,6 +20,9 @@ import (
 type UserService interface {
 	// RegisterUserByEmail 通过邮箱注册账号
 	RegisterUserByEmail(c context.Context, req *schema.RegisterUserByEmailReq) (*schema.RegisterUserByEmailRes, []*validator.FieldError, error)
+
+	// VerifyEmail 验证电子邮件
+	VerifyEmail(c context.Context, req *schema.VerifyEmailReq) (*schema.VerifyEmailRes, error)
 }
 
 type UserServiceImpl struct {
@@ -71,7 +74,7 @@ func (s *UserServiceImpl) RegisterUserByEmail(c context.Context, req *schema.Reg
 	user := &model.User{
 		Email:         req.Email,
 		DisplayName:   req.Name,
-		IP:            req.IP,
+		IpInfo:        req.IP,
 		Status:        model.UserStatusAvailable,
 		MailStatus:    model.EmailStatusToBeVerified,
 		LastLoginDate: time.Now().Unix(),
@@ -96,21 +99,58 @@ func (s *UserServiceImpl) RegisterUserByEmail(c context.Context, req *schema.Reg
 	// 异步发送注册验证邮件
 	go emailService.SendRegisterVerificationEmail(c, user.Id, user.Email)
 
-	// 创建用户信息对象
-	userInfo := &model.UserInfo{
-		UserId:      user.Id,
-		RoleId:      model.RoleIdUser,
-		EmailStatus: user.MailStatus,
-		UserStatus:  user.Status,
-	}
+	// 设置用户相关 token
 	res.User = *user
 	res.RoleId = model.RoleIdUser
-	// 设置用户缓存信息并获取访问令牌和访问令牌，如果出错
-	res.AccessToken, res.VisitToken, err = authService.SetUserCacheInfo(c, userInfo)
+	res.AccessToken, res.VisitToken, err = authService.SetUserCacheInfo(c, user)
 	if err != nil {
-		log.WithContext(c).Errorf("生成用户相关 token 发送错误: %v", err)
+		log.WithContext(c).Errorf("生成用户相关 token 发生错误: %v", err)
 		return nil, nil, err
 	}
 
 	return res, nil, nil
+}
+
+// VerifyEmail 函数用于验证用户的电子邮件。
+//
+// 参数:
+//   - c: 上下文
+//   - req: 包含要验证的电子邮件的请求
+//
+// 返回:
+//   - *schema.VerifyEmailRes: 验证电子邮件的响应
+//   - error: 可能返回的错误
+func (s *UserServiceImpl) VerifyEmail(c context.Context, req *schema.VerifyEmailReq) (*schema.VerifyEmailRes, error) {
+	res := &schema.VerifyEmailRes{}
+
+	// 通过电子邮件查询用户，如果查询失败则记录错误并返回
+	user, exist, err := s.UserRepo.GetUserByEmail(c, req.Email.Email)
+	if err != nil {
+		log.WithContext(c).Errorf("通过邮箱 [%s] 查询用户失败: %v", req.Email.Email, err)
+		return nil, err
+	} else if !exist {
+		log.WithContext(c).Infof("邮箱 [%s] 未注册", req.Email.Email)
+		return nil, errors.BadRequest(reason.UserNotFound)
+	}
+
+	// 如果用户的邮件状态为待验证，更新为可用
+	if user.MailStatus == model.EmailStatusToBeVerified {
+		user.MailStatus = model.EmailStatusAvailable
+		if err = s.UserRepo.UpdateEmailStatus(c, user.Id, user.MailStatus); err != nil {
+			log.WithContext(c).Errorf("更新用户 [%d] 邮箱状态 [%s] 失败: %v", user.Id, user.MailStatus, err)
+			return nil, err
+		}
+	}
+
+	// 生成用户相关的 token，如果生成出错则记录错误并返回
+	if res.AccessToken, res.VisitToken, err = authService.SetUserCacheInfo(c, user); err != nil {
+		log.WithContext(c).Errorf("生成用户相关 token 发生错误: %v", err)
+		return nil, err
+	}
+
+	// TODO activity
+
+	// TODO three-party login
+
+	return res, nil
 }

@@ -24,9 +24,9 @@ const (
 	CacheTimeUserAccessToken = 7 * 24 * time.Hour
 
 	// 用户最新邮件验证码: (int64)user id -> (string)code
-	CacheKeyVerificationEmailLatestCode = "askme:verification_email:latest_code:user_id:%d"
+	CacheKeyVerificationEmailLatestCode = "askme:email:verification:latest_code:user_id:%d"
 
 	// 验证邮件: (string)code -> (*model.VerificationEmail)email content
-	CacheKeyVerificationEmail  = "askme:verification_email:code:%s"
+	CacheKeyVerificationEmail  = "askme:email:verification:code:%s"
 	CacheTimeVerificationEmail = 10 * time.Minute
 )

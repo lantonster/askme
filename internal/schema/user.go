@@ -7,12 +7,12 @@ import (
 )
 
 type RegisterUserByEmailReq struct {
-	Name        string `validate:"required,gte=2,lte=30" json:"name"`
-	Email       string `validate:"required,email,gt=0,lte=500" json:"e_mail" `
-	Pass        string `validate:"required,gte=8,lte=32" json:"pass"`
-	CaptchaID   string `json:"captcha_id"`
-	CaptchaCode string `json:"captcha_code"`
-	IP          string `json:"-" `
+	Name        string `validate:"required,gte=2,lte=30" json:"name"`          // 用户名
+	Email       string `validate:"required,email,gt=0,lte=500" json:"e_mail" ` // 邮箱
+	Pass        string `validate:"required,gte=8,lte=32" json:"pass"`          // 密码
+	CaptchaID   string `json:"captcha_id"`                                     // 验证码 id
+	CaptchaCode string `json:"captcha_code"`                                   // 验证码
+	IP          string `json:"-" `                                             // IP 地址
 }
 
 // Check 方法用于检查 `RegisterUserByEmailReq` 中密码的有效性。
@@ -33,10 +33,19 @@ func (r *RegisterUserByEmailReq) Check() (fields []*validator.FieldError, err er
 	return nil, nil
 }
 
-type RegisterUserByEmailRes struct {
+type RegisterUserByEmailRes = UserLoginRes
+
+type VerifyEmailReq struct {
+	Code  string                   `validate:"required,gt=0,lte=500" form:"code"` // 验证码
+	Email *model.VerificationEmail `json:"-"`                                     // 验证邮箱内容
+}
+
+type VerifyEmailRes = UserLoginRes
+
+type UserLoginRes struct {
 	model.User
 
-	RoleId      int64  `json:"role_id"`
-	AccessToken string `json:"access_token"`
-	VisitToken  string `json:"visit_token"`
+	RoleId      int64  `json:"role_id"`      // 角色 ID
+	AccessToken string `json:"access_token"` // 访问令牌
+	VisitToken  string `json:"visit_token"`  // 访问令牌
 }

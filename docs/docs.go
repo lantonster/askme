@@ -14,7 +14,224 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/askme/api/v1/user/email/verification": {
+            "post": {
+                "description": "邮箱验证",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "邮箱验证",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schema.VerificationEmailReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/handler.ResponseBody"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/schema.VerificationEmailRes"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/askme/api/v1/user/register/email": {
+            "post": {
+                "description": "通过邮箱注册账号",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "通过邮箱注册账号",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schema.RegisterUserByEmailReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/handler.ResponseBody"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/schema.RegisterUserByEmailRes"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handler.ResponseBody": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "http code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "response data"
+                },
+                "msg": {
+                    "description": "response message",
+                    "type": "string"
+                },
+                "reason": {
+                    "description": "reason key",
+                    "type": "string"
+                }
+            }
+        },
+        "schema.RegisterUserByEmailReq": {
+            "type": "object",
+            "required": [
+                "e_mail",
+                "name",
+                "pass"
+            ],
+            "properties": {
+                "captcha_code": {
+                    "type": "string"
+                },
+                "captcha_id": {
+                    "type": "string"
+                },
+                "e_mail": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 30,
+                    "minLength": 2
+                },
+                "pass": {
+                    "type": "string",
+                    "maxLength": 32,
+                    "minLength": 8
+                }
+            }
+        },
+        "schema.RegisterUserByEmailRes": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "description": "头像",
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "integer"
+                },
+                "deletedAt": {
+                    "type": "integer"
+                },
+                "displayName": {
+                    "description": "昵称",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "邮箱",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ip": {
+                    "description": "IP 地址",
+                    "type": "string"
+                },
+                "lastLoginDate": {
+                    "description": "上次登录时间",
+                    "type": "integer"
+                },
+                "mailStatus": {
+                    "description": "邮箱状态",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "用户状态",
+                    "type": "string"
+                },
+                "suspendedAt": {
+                    "description": "被禁言的时间",
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "integer"
+                },
+                "username": {
+                    "description": "用户名",
+                    "type": "string"
+                },
+                "visit_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "schema.VerificationEmailReq": {
+            "type": "object"
+        },
+        "schema.VerificationEmailRes": {
+            "type": "object"
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it

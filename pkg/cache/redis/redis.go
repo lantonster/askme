@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
 	"github.com/lantonster/askme/pkg/cache"
 )
@@ -22,6 +23,16 @@ func NewCache(conn, username, password string) *Cache {
 		Username: username,
 		Password: password,
 	})
+	return &Cache{Client: client}
+}
+
+func NewMemoryCache() *Cache {
+	// 创建内存中的 Redis 数据库连接
+	s, err := miniredis.Run()
+	if err != nil {
+		panic(err)
+	}
+	client := redis.NewClient(&redis.Options{Addr: s.Addr()})
 	return &Cache{Client: client}
 }
 

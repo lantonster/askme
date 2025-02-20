@@ -1,5 +1,5 @@
 .PHONY: pre
-pre: ui orm swag wire
+pre: ui orm swag wire mock
 
 .PHONY: run
 run:
@@ -20,3 +20,13 @@ swag:
 .PHONY: wire
 wire:
 	wire gen cmd/wire/wire.go
+
+.PHONY: mock
+mock:
+	sh scripts/mock_gen.sh internal/repo mock/repo
+	sh scripts/mock_gen.sh internal/service mock/service
+
+.PHONY: test
+test:
+	go test $(GOFLAGS) -race -cover -coverprofile=test/cover.out ./...
+	go tool cover -html=test/cover.out

@@ -44,7 +44,10 @@ func Init() *server.Server {
 	swaggerRouter := router.NewSwaggerRouter(config)
 	uiRouter := router.NewUiRouter(config)
 	uploadsRouter := router.NewUploadsRouter(config)
+	routerRouter := router.NewRouter(askMeRouter, swaggerRouter, uiRouter, uploadsRouter)
+	authMiddleware := middleware.NewAuthMiddleware(serviceService)
 	avatarMiddleware := middleware.NewAvatarMiddleware(config, serviceService)
-	serverServer := server.NewHttpServer(config, askMeRouter, swaggerRouter, uiRouter, uploadsRouter, avatarMiddleware)
+	middlewareMiddleware := middleware.NewMiddleware(authMiddleware, avatarMiddleware)
+	serverServer := server.NewHttpServer(config, routerRouter, middlewareMiddleware)
 	return serverServer
 }

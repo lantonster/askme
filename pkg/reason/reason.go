@@ -27,6 +27,9 @@ const (
 	// 配置不存在
 	ConfigNotFound = "error.config.not_found"
 
+	// 邮箱需要验证
+	EmailNeedToBeVerified = "error.email.need_to_be_verified"
+
 	// 邮箱域名不合法
 	EmailIllegalDomainError = "error.email.illegal_email_domain_error"
 
@@ -56,4 +59,7 @@ const (
 
 	// 不允许用户注册
 	UserRegistrationNotAllowed = "error.user.registration_not_allowed"
+
+	// 用户被禁用
+	UserSuspended = "error.user.suspended"
 )

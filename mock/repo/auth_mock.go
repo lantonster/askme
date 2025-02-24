@@ -49,6 +49,36 @@ func (mr *MockAuthRepoMockRecorder) AddUserAccessToken(c, userId, accessToken in
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddUserAccessToken", reflect.TypeOf((*MockAuthRepo)(nil).AddUserAccessToken), c, userId, accessToken)
 }
 
+// GetAccessTokenByVisitToken mocks base method.
+func (m *MockAuthRepo) GetAccessTokenByVisitToken(c context.Context, visitToken string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAccessTokenByVisitToken", c, visitToken)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAccessTokenByVisitToken indicates an expected call of GetAccessTokenByVisitToken.
+func (mr *MockAuthRepoMockRecorder) GetAccessTokenByVisitToken(c, visitToken interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccessTokenByVisitToken", reflect.TypeOf((*MockAuthRepo)(nil).GetAccessTokenByVisitToken), c, visitToken)
+}
+
+// GetUserCacheByAccessToken mocks base method.
+func (m *MockAuthRepo) GetUserCacheByAccessToken(c context.Context, accessToken string) (*model.UserInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserCacheByAccessToken", c, accessToken)
+	ret0, _ := ret[0].(*model.UserInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserCacheByAccessToken indicates an expected call of GetUserCacheByAccessToken.
+func (mr *MockAuthRepoMockRecorder) GetUserCacheByAccessToken(c, accessToken interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserCacheByAccessToken", reflect.TypeOf((*MockAuthRepo)(nil).GetUserCacheByAccessToken), c, accessToken)
+}
+
 // SetUserCache mocks base method.
 func (m *MockAuthRepo) SetUserCache(c context.Context, accessToken string, user *model.UserInfo) error {
 	m.ctrl.T.Helper()

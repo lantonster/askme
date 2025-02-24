@@ -20,47 +20,55 @@ import (
 
 func NewHttpServer(
 	config *conf.Config,
-	askmeRouter *router.AskMeRouter,
-	swaggerRouter *router.SwaggerRouter,
-	uiRouter *router.UiRouter,
-	uploadsRouter *router.UploadsRouter,
-	avatarMid *middleware.AvatarMiddleware,
+	router *router.Router,
+	mid *middleware.Middleware,
 ) *Server {
 	// 设置 gin 的运行模式
 	gin.SetMode(utils.Ternary(config.Server.Http.Debug, gin.DebugMode, gin.ReleaseMode))
 
-	r := gin.New()
+	engine := gin.New()
 
 	// 注册 html 模板
 	html, _ := fs.Sub(ui.Template, "template")
 	htmlTemplate := template.Must(template.New("").Funcs(funcMap).ParseFS(html, "*")) // TODO funcmap
-	r.SetHTMLTemplate(htmlTemplate)
+	engine.SetHTMLTemplate(htmlTemplate)
 
 	// TODO middleware: langeuage, session, cors, logger, recovery, short id
-	r.GET("/ping", func(c *gin.Context) { c.String(http.StatusOK, "pong") })
+	engine.GET("/ping", func(c *gin.Context) { c.String(http.StatusOK, "pong") })
 
 	// 注册 UI 路由
-	r.Use(middleware.SetStaticCacheHeader) // 设置静态文件缓存
-	uiRouter.Register(r)
+	engine.Use(middleware.SetStaticCacheHeader) // 设置静态文件缓存
+	router.Ui.Register(engine)
 
 	// 注册 swagger 路由
-	swaggerRouter.Register(r.Group("/swagger"))
+	router.Swagger.Register(engine.Group("/swagger"))
 
 	// 图片路由和登陆验证
-	uploadsRouter.Register(r.Group("/uploads", avatarMid.AvatarThumb /* TODO vist auth */))
+	router.Uploads.Register(engine.Group("/uploads", mid.Avatar.AvatarThumb /* TODO vist auth */))
 
 	// 注册 askme 路由
-	askme := r.Group("/askme/api/v1")
+	askme := engine.Group("/askme/api/v1")
 	{
-		// 不需要鉴权的路由
-		askmeRouter.RegisterNoAuth(askme)
+		// 不需要鉴权
+		router.AskMe.RegisterNoAuth(askme.Group("", mid.Auth.NoAuth))
+
+		// 根据网站配置决定是否需要登陆
+		askme.Group("", mid.Auth.NoAuth, mid.Auth.EjectUserBySiteInfo)
+
+		// 需要登陆但不要求账号可用
+		askme.Group("", mid.Auth.MustAuthWithoutAccountAvailable)
+
+		// 需要登陆并且账号可用
+		askme.Group("", mid.Auth.MustAuthAndAccountAvailable)
+
+		// 管理端
 	}
 
 	return &Server{
 		ShutdownTimeout: config.Server.Http.ShutdownTimeout,
 		srv: &http.Server{
 			Addr:    config.Server.Http.Addr,
-			Handler: r,
+			Handler: engine,
 		},
 	}
 }

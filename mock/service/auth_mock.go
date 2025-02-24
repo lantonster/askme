@@ -35,6 +35,35 @@ func (m *MockAuthService) EXPECT() *MockAuthServiceMockRecorder {
 	return m.recorder
 }
 
+// CheckVisitToken mocks base method.
+func (m *MockAuthService) CheckVisitToken(c context.Context, visitToken string) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckVisitToken", c, visitToken)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// CheckVisitToken indicates an expected call of CheckVisitToken.
+func (mr *MockAuthServiceMockRecorder) CheckVisitToken(c, visitToken interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckVisitToken", reflect.TypeOf((*MockAuthService)(nil).CheckVisitToken), c, visitToken)
+}
+
+// GetUserCacheInfo mocks base method.
+func (m *MockAuthService) GetUserCacheInfo(c context.Context, accessToken string) (*model.UserInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserCacheInfo", c, accessToken)
+	ret0, _ := ret[0].(*model.UserInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserCacheInfo indicates an expected call of GetUserCacheInfo.
+func (mr *MockAuthServiceMockRecorder) GetUserCacheInfo(c, accessToken interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserCacheInfo", reflect.TypeOf((*MockAuthService)(nil).GetUserCacheInfo), c, accessToken)
+}
+
 // SetUserCacheInfo mocks base method.
 func (m *MockAuthService) SetUserCacheInfo(c context.Context, user *model.User) (string, string, error) {
 	m.ctrl.T.Helper()

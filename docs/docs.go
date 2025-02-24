@@ -200,6 +200,9 @@ const docTemplate = `{
                     "description": "密码",
                     "type": "string"
                 },
+                "rank": {
+                    "type": "integer"
+                },
                 "role_id": {
                     "description": "角色 ID",
                     "type": "integer"
@@ -209,7 +212,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "suspendedAt": {
-                    "description": "被禁言的时间",
+                    "description": "被禁用的时间",
                     "type": "integer"
                 },
                 "updatedAt": {
@@ -282,6 +285,9 @@ const docTemplate = `{
                     "description": "密码",
                     "type": "string"
                 },
+                "rank": {
+                    "type": "integer"
+                },
                 "role_id": {
                     "description": "角色 ID",
                     "type": "integer"
@@ -291,7 +297,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "suspendedAt": {
-                    "description": "被禁言的时间",
+                    "description": "被禁用的时间",
                     "type": "integer"
                 },
                 "updatedAt": {

@@ -51,7 +51,7 @@ func (s *Service) ActivityService() ActivityService {
 	return activityService
 }
 
-func (s *Service) Auth() AuthService {
+func (s *Service) AuthService() AuthService {
 	return authService
 }
 

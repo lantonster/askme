@@ -66,6 +66,8 @@ definitions:
       password:
         description: 密码
         type: string
+      rank:
+        type: integer
       role_id:
         description: 角色 ID
         type: integer
@@ -73,7 +75,7 @@ definitions:
         description: 用户状态
         type: string
       suspendedAt:
-        description: 被禁言的时间
+        description: 被禁用的时间
         type: integer
       updatedAt:
         type: integer
@@ -125,6 +127,8 @@ definitions:
       password:
         description: 密码
         type: string
+      rank:
+        type: integer
       role_id:
         description: 角色 ID
         type: integer
@@ -132,7 +136,7 @@ definitions:
         description: 用户状态
         type: string
       suspendedAt:
-        description: 被禁言的时间
+        description: 被禁用的时间
         type: integer
       updatedAt:
         type: integer

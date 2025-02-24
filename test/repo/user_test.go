@@ -71,14 +71,14 @@ func TestGetUserByUsername(t *testing.T) {
 func TestGenerateUniqueUsername(t *testing.T) {
 	repo := repo.NewUserRepo(data)
 
-	t.Run("pinyin", func(t *testing.T) {
+	t.Run("拼音", func(t *testing.T) {
 		username := "蓝"
 		_username, err := repo.GenerateUniqueUsername(context.Background(), username)
 		assert.NoError(t, err)
 		assert.Equal(t, "lan", _username)
 	})
 
-	t.Run("too long", func(t *testing.T) {
+	t.Run("字符串太长", func(t *testing.T) {
 		username := strings.Repeat("a", 31)
 		_, err := repo.GenerateUniqueUsername(context.Background(), username)
 		assert.Error(t, err)
@@ -88,7 +88,7 @@ func TestGenerateUniqueUsername(t *testing.T) {
 		assert.Equal(t, reason.UsernameInvalid, e.Reason)
 	})
 
-	t.Run("reserved", func(t *testing.T) {
+	t.Run("保留字不可用", func(t *testing.T) {
 		username := "admin"
 		_, err := repo.GenerateUniqueUsername(context.Background(), username)
 		assert.Error(t, err)
@@ -98,7 +98,7 @@ func TestGenerateUniqueUsername(t *testing.T) {
 		assert.Equal(t, reason.UsernameInvalid, e.Reason)
 	})
 
-	t.Run("repeat", func(t *testing.T) {
+	t.Run("用户名已存在", func(t *testing.T) {
 		repo.CreateUser(context.Background(), &model.User{Id: 4, Username: "user004"})
 
 		username := "user004"

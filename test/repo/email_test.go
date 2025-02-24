@@ -63,13 +63,13 @@ func TestVerifyCode(t *testing.T) {
 		}
 	}
 
-	t.Run("code expired", func(t *testing.T) {
+	t.Run("验证码过期", func(t *testing.T) {
 		_, success, err := repo.VerifyCode(context.Background(), "expired")
 		assert.NoError(t, err)
 		assert.False(t, success)
 	})
 
-	t.Run("skip validateion latest code", func(t *testing.T) {
+	t.Run("跳过最新验证码", func(t *testing.T) {
 		init()
 
 		email, success, err := repo.VerifyCode(context.Background(), skipCode[0])
@@ -78,7 +78,7 @@ func TestVerifyCode(t *testing.T) {
 		assert.Equal(t, skip, email)
 	})
 
-	t.Run("no skip", func(t *testing.T) {
+	t.Run("不能跳过最新验证码", func(t *testing.T) {
 		init()
 
 		_, success, err := repo.VerifyCode(context.Background(), noSkipCode[0])

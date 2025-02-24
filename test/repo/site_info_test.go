@@ -25,7 +25,7 @@ func TestFirstSiteInfoByType(t *testing.T) {
 	}
 	bytes, _ := json.Marshal(siteInfo)
 
-	t.Run("from cache", func(t *testing.T) {
+	t.Run("从缓存中获得", func(t *testing.T) {
 		key := fmt.Sprintf(constant.CacheKeySiteInfo, siteInfo.Type)
 		rdb.Set(context.Background(), key, string(bytes), 0)
 
@@ -34,7 +34,7 @@ func TestFirstSiteInfoByType(t *testing.T) {
 		assert.Equal(t, siteInfo, _siteInfo)
 	})
 
-	t.Run("from db", func(t *testing.T) {
+	t.Run("从数据库中获得", func(t *testing.T) {
 		db.Create(siteInfo)
 
 		_siteInfo, err := repo.FirstSiteInfoByType(context.Background(), model.SiteInfoType(siteInfo.Type))

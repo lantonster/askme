@@ -16,7 +16,7 @@ import (
 func TestFirstConfigByKey(t *testing.T) {
 	repo := repo.NewConfigRepo(data)
 
-	t.Run("from cache", func(t *testing.T) {
+	t.Run("从缓存中获得", func(t *testing.T) {
 		config := &model.Config{Key: "from_cache", Value: "test"}
 		cacheKey := fmt.Sprintf(constant.CacheKeyConfig, config.Key)
 		bytes, _ := json.Marshal(config)
@@ -27,7 +27,7 @@ func TestFirstConfigByKey(t *testing.T) {
 		assert.Equal(t, config, _config)
 	})
 
-	t.Run("from db", func(t *testing.T) {
+	t.Run("从数据库中获得", func(t *testing.T) {
 		config := &model.Config{Key: "from_db", Value: "test"}
 		db.Create(config)
 

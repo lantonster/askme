@@ -25,7 +25,7 @@ func TestCreateActivity(t *testing.T) {
 func TestGetActivityByType(t *testing.T) {
 	repo := repo.NewActivityRepo(data)
 
-	t.Run("exist", func(t *testing.T) {
+	t.Run("活动存在", func(t *testing.T) {
 		activity := &model.Activity{Id: 2, Type: "test"}
 		db.Create(activity)
 
@@ -35,7 +35,7 @@ func TestGetActivityByType(t *testing.T) {
 		assert.Equal(t, activity, _activity)
 	})
 
-	t.Run("not exist", func(t *testing.T) {
+	t.Run("活动不存在", func(t *testing.T) {
 		_, ok, err := repo.GetActivityByType(context.Background(), "not_exist")
 		assert.NoError(t, err)
 		assert.False(t, ok)

@@ -37,14 +37,6 @@ func NewEmailService(repo *repo.Repo) EmailService {
 	return &EmailServiceImpl{Repo: repo}
 }
 
-func (s *EmailServiceImpl) getSiteUrl(c context.Context) string {
-	general, err := siteInfoService.GetSiteGeneral(c)
-	if err != nil {
-		return ""
-	}
-	return general.SiteUrl
-}
-
 // Send 发送邮件。
 //
 // 参数:
@@ -104,14 +96,15 @@ func (s *EmailServiceImpl) Send(c context.Context, email, subject, body string) 
 func (s *EmailServiceImpl) SendRegisterVerificationEmail(c context.Context, userId int64, email string) error {
 	// 生成验证码
 	code := token.GenerateToken()
-	// 生成注册 URL
-	registerUrl := fmt.Sprintf("%s/users/account-activation?code=%s", s.getSiteUrl(c), code)
 
 	// 获取站点通用信息，如果获取失败则返回错误
 	general, err := siteInfoService.GetSiteGeneral(c)
 	if err != nil {
 		return err
 	}
+
+	// 生成注册 URL
+	registerUrl := fmt.Sprintf("%s/users/account-activation?code=%s", general.SiteUrl, code)
 
 	// 获取语言并初始化注册模板数据
 	lang := handler.GetLangByCtx(c)
@@ -129,7 +122,7 @@ func (s *EmailServiceImpl) SendRegisterVerificationEmail(c context.Context, user
 	}
 
 	// 发送邮件，如果发送失败则记录错误并返回
-	if err := s.Send(c, email, title, body); err != nil {
+	if err := emailService.Send(c, email, title, body); err != nil {
 		log.WithContext(c).Errorf("发送邮件失败: %v", err)
 		return err
 	}

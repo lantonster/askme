@@ -13,6 +13,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.20.0
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.6.0
 	github.com/microcosm-cc/bluemonday v1.0.27
@@ -24,7 +25,6 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.4
-	go.uber.org/mock v0.5.0
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.24.0
 	golang.org/x/text v0.16.0

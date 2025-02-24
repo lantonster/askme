@@ -20,12 +20,14 @@ func NewAskMeRouter(
 // 注册不需要鉴权的路由
 func (r *AskMeRouter) RegisterNoAuth(router *gin.RouterGroup) {
 
-	// TODO
-
 	user := router.Group("/user")
 	{
+
 		// 邮箱确认
 		user.POST("/email/verification", r.userController.VerifyEmail)
+
+		// 当前用户信息
+		user.GET("/info", r.userController.CurrentUserInfo)
 
 		// 邮箱注册
 		user.POST("/register/email", r.userController.RegisterUserByEmail)

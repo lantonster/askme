@@ -18,6 +18,9 @@ import (
 )
 
 type UserService interface {
+	// GetUserByUserId 根据用户 ID 获取用户信息
+	GetUserByUserId(c context.Context, userId int64) (*schema.GetUserByUserIdRes, error)
+
 	// RegisterUserByEmail 通过邮箱注册账号
 	RegisterUserByEmail(c context.Context, req *schema.RegisterUserByEmailReq) (*schema.RegisterUserByEmailRes, []*validator.FieldError, error)
 
@@ -41,6 +44,26 @@ func (s *UserServiceImpl) encryptPassword(c context.Context, password string) (s
 		return "", fmt.Errorf("密码加密失败: %+w", err)
 	}
 	return string(hashPwd), nil
+}
+
+func (s *UserServiceImpl) GetUserByUserId(c context.Context, userId int64) (*schema.GetUserByUserIdRes, error) {
+	user, exist, err := s.UserRepo.GetUserById(c, userId)
+	if err != nil {
+		log.WithContext(c).Errorf("查询用户 [%d] 信息失败: %v", userId, err)
+		return nil, err
+	} else if !exist {
+		log.WithContext(c).Errorf("用户 [%d] 不存在", userId)
+		return nil, errors.BadRequest(reason.UserNotFound)
+	} else if user.Status == model.UserStatusDeleted {
+		return nil, errors.Unauthorized(reason.UnauthorizedError)
+	}
+
+	// TODO role id
+
+	return &schema.GetUserByUserIdRes{
+		User:         *user,
+		HavePassword: len(user.Password) > 0,
+	}, nil
 }
 
 // RegisterUserByEmail 通过电子邮件注册用户。

@@ -61,6 +61,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/askme/api/v1/user/info": {
+            "get": {
+                "description": "获取用户信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "获取用户信息",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/handler.ResponseBody"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/schema.GetUserByUserIdRes"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/askme/api/v1/user/register/email": {
             "post": {
                 "description": "通过邮箱注册账号",
@@ -129,6 +164,82 @@ const docTemplate = `{
                 }
             }
         },
+        "schema.GetUserByUserIdRes": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "description": "访问令牌",
+                    "type": "string"
+                },
+                "avatar": {
+                    "description": "头像",
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "integer"
+                },
+                "deletedAt": {
+                    "type": "integer"
+                },
+                "displayName": {
+                    "description": "昵称",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "邮箱",
+                    "type": "string"
+                },
+                "have_password": {
+                    "description": "是否有密码",
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ipInfo": {
+                    "description": "IP 地址",
+                    "type": "string"
+                },
+                "lastLoginDate": {
+                    "description": "上次登录时间",
+                    "type": "integer"
+                },
+                "mailStatus": {
+                    "description": "邮箱状态",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                },
+                "rank": {
+                    "type": "integer"
+                },
+                "role_id": {
+                    "description": "角色 ID",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "用户状态",
+                    "type": "string"
+                },
+                "suspendedAt": {
+                    "description": "被禁用的时间",
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "integer"
+                },
+                "username": {
+                    "description": "用户名",
+                    "type": "string"
+                },
+                "visit_token": {
+                    "description": "访问令牌",
+                    "type": "string"
+                }
+            }
+        },
         "schema.RegisterUserByEmailReq": {
             "type": "object",
             "required": [
@@ -180,6 +291,10 @@ const docTemplate = `{
                 "email": {
                     "description": "邮箱",
                     "type": "string"
+                },
+                "have_password": {
+                    "description": "是否有密码",
+                    "type": "boolean"
                 },
                 "id": {
                     "type": "integer"
@@ -265,6 +380,10 @@ const docTemplate = `{
                 "email": {
                     "description": "邮箱",
                     "type": "string"
+                },
+                "have_password": {
+                    "description": "是否有密码",
+                    "type": "boolean"
                 },
                 "id": {
                     "type": "integer"

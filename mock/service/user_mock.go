@@ -36,6 +36,21 @@ func (m *MockUserService) EXPECT() *MockUserServiceMockRecorder {
 	return m.recorder
 }
 
+// GetUserByUserId mocks base method.
+func (m *MockUserService) GetUserByUserId(c context.Context, userId int64) (*schema.GetUserByUserIdRes, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserByUserId", c, userId)
+	ret0, _ := ret[0].(*schema.GetUserByUserIdRes)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserByUserId indicates an expected call of GetUserByUserId.
+func (mr *MockUserServiceMockRecorder) GetUserByUserId(c, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByUserId", reflect.TypeOf((*MockUserService)(nil).GetUserByUserId), c, userId)
+}
+
 // RegisterUserByEmail mocks base method.
 func (m *MockUserService) RegisterUserByEmail(c context.Context, req *schema.RegisterUserByEmailReq) (*schema.RegisterUserByEmailRes, []*validator.FieldError, error) {
 	m.ctrl.T.Helper()

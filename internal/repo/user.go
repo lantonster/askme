@@ -23,6 +23,9 @@ type UserRepo interface {
 	// GetUserByEmail 函数根据给定的电子邮件从数据库中获取用户信息。
 	GetUserByEmail(c context.Context, email string) (user *model.User, exist bool, err error)
 
+	// GetUserById 根据用户 ID 获取用户信息。
+	GetUserById(c context.Context, userId int64) (*model.User, bool, error)
+
 	// GetUserByUsername 函数根据给定的用户名从数据库中获取用户信息。
 	GetUserByUsername(c context.Context, username string) (user *model.User, exist bool, err error)
 
@@ -77,6 +80,28 @@ func (r *userRepo) CreateUser(c context.Context, user *model.User) error {
 //   - error: 可能出现的错误
 func (r *userRepo) GetUserByEmail(c context.Context, email string) (user *model.User, exist bool, err error) {
 	users, err := orm.Q.User.WithContext(c).Where(orm.Q.User.Email.Eq(email)).Find()
+	if err != nil {
+		return nil, false, errors.InternalServer(reason.DatabaseError).WithError(err).WithStack()
+	}
+
+	if len(users) == 0 {
+		return nil, false, nil
+	}
+	return users[0], true, nil
+}
+
+// GetUserById 根据用户 ID 获取用户信息。
+//
+// 参数:
+//   - c: 上下文
+//   - userId: 用户 ID
+//
+// 返回:
+//   - *model.User: 用户对象，如果未找到则为 nil
+//   - exist: 是否存在该用户
+//   - error: 可能出现的错误
+func (r *userRepo) GetUserById(c context.Context, userId int64) (*model.User, bool, error) {
+	users, err := orm.Q.User.WithContext(c).Where(orm.Q.User.Id.Eq(userId)).Find()
 	if err != nil {
 		return nil, false, errors.InternalServer(reason.DatabaseError).WithError(err).WithStack()
 	}

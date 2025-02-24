@@ -1,11 +1,16 @@
 package controller
 
 import (
+	"net/url"
+
 	"github.com/gin-gonic/gin"
+	"github.com/lantonster/askme/internal/constant"
+	"github.com/lantonster/askme/internal/middleware"
 	"github.com/lantonster/askme/internal/schema"
 	"github.com/lantonster/askme/internal/service"
 	"github.com/lantonster/askme/pkg/errors"
 	"github.com/lantonster/askme/pkg/handler"
+	"github.com/lantonster/askme/pkg/log"
 	"github.com/lantonster/askme/pkg/reason"
 )
 
@@ -15,6 +20,37 @@ type UserController struct {
 
 func NewUserController(service *service.Service) *UserController {
 	return &UserController{Service: service}
+}
+
+// SetVisitCookies 函数用于设置用户访问的 Cookie。
+//
+// 参数:
+//   - c: Gin 上下文
+//   - visitToken: 访问令牌
+//   - force: 是否强制设置，即使已有 Cookie 且不强制时不会设置
+func (ctrl *UserController) SetVisitCookies(c *gin.Context, visitToken string, force bool) {
+	// 尝试获取已有的访问令牌 Cookie
+	cookie, err := c.Cookie(constant.CookieKeyUserVisitToken)
+	if err == nil && len(cookie) > 0 && !force {
+		return
+	}
+
+	// 获取站点通用信息
+	general, err := ctrl.SiteInfoService().GetSiteGeneral(c)
+	if err != nil {
+		log.WithContext(c).Errorf("获取站点信息失败: %v", err)
+		return
+	}
+
+	// 解析站点 URL
+	url, err := url.Parse(general.SiteUrl)
+	if err != nil {
+		log.WithContext(c).Errorf("解析站点 URL [%s] 失败: %v", general.SiteUrl, err)
+		return
+	}
+
+	// 设置新的 Cookie
+	c.SetCookie(constant.CookieKeyUserVisitToken, visitToken, int(constant.CookieTimeUserVisitToken), "/", url.Host, true, true)
 }
 
 // VerifyEmail godoc
@@ -46,6 +82,32 @@ func (ctrl *UserController) VerifyEmail(c *gin.Context) {
 	}
 
 	handler.Response(c, nil, resp)
+}
+
+// CurrentUserInfo godoc
+//
+//	@Summary		获取用户信息
+//	@Description	获取用户信息
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	handler.ResponseBody{data=schema.GetUserByUserIdRes}	"success"
+//	@Router			/askme/api/v1/user/info [get]
+func (ctrl *UserController) CurrentUserInfo(c *gin.Context) {
+	// 从上下文中获取用户信息
+	user := middleware.GetUserInfoFromContext(c)
+	if user == nil {
+		handler.Response(c, nil, nil)
+		return
+	}
+
+	// 获取用户详细信息
+	resp, err := ctrl.UserService().GetUserByUserId(c, user.UserId)
+	resp.AccessToken = middleware.ExtractToken(c)
+
+	// 设置访问 Cookie
+	ctrl.SetVisitCookies(c, user.VisitToken, false)
+	handler.Response(c, err, resp)
 }
 
 // RegisterUserByEmail godoc

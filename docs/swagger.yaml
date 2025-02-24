@@ -13,6 +13,61 @@ definitions:
         description: reason key
         type: string
     type: object
+  schema.GetUserByUserIdRes:
+    properties:
+      access_token:
+        description: 访问令牌
+        type: string
+      avatar:
+        description: 头像
+        type: string
+      createdAt:
+        type: integer
+      deletedAt:
+        type: integer
+      displayName:
+        description: 昵称
+        type: string
+      email:
+        description: 邮箱
+        type: string
+      have_password:
+        description: 是否有密码
+        type: boolean
+      id:
+        type: integer
+      ipInfo:
+        description: IP 地址
+        type: string
+      lastLoginDate:
+        description: 上次登录时间
+        type: integer
+      mailStatus:
+        description: 邮箱状态
+        type: string
+      password:
+        description: 密码
+        type: string
+      rank:
+        type: integer
+      role_id:
+        description: 角色 ID
+        type: integer
+      status:
+        description: 用户状态
+        type: string
+      suspendedAt:
+        description: 被禁用的时间
+        type: integer
+      updatedAt:
+        type: integer
+      username:
+        description: 用户名
+        type: string
+      visit_token:
+        description: 访问令牌
+        type: string
+    type: object
   schema.RegisterUserByEmailReq:
     properties:
       e_mail:
@@ -52,6 +107,9 @@ definitions:
       email:
         description: 邮箱
         type: string
+      have_password:
+        description: 是否有密码
+        type: boolean
       id:
         type: integer
       ipInfo:
@@ -113,6 +171,9 @@ definitions:
       email:
         description: 邮箱
         type: string
+      have_password:
+        description: 是否有密码
+        type: boolean
       id:
         type: integer
       ipInfo:
@@ -175,6 +236,26 @@ paths:
                   $ref: '#/definitions/schema.VerifyEmailRes'
               type: object
       summary: 邮箱验证
+      tags:
+      - User
+  /askme/api/v1/user/info:
+    get:
+      consumes:
+      - application/json
+      description: 获取用户信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.ResponseBody'
+            - properties:
+                data:
+                  $ref: '#/definitions/schema.GetUserByUserIdRes'
+              type: object
+      summary: 获取用户信息
       tags:
       - User
   /askme/api/v1/user/register/email:

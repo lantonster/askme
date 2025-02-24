@@ -152,7 +152,7 @@ export const resendEmail = (params?: Type.ImgCodeReq) => {
  * @returns {UserInfo}
  */
 export const getLoggedUserInfo = (config = { passingError: false }) => {
-  return request.get<Type.UserInfoRes>('/answer/api/v1/user/info', config);
+  return request.get<Type.UserInfoRes>('/askme/api/v1/user/info', config);
 };
 
 export const modifyUserInfo = (params: Type.ModifyUserReq) => {

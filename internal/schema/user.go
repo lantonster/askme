@@ -40,10 +40,13 @@ type VerifyEmailReq struct {
 
 type VerifyEmailRes = UserLoginRes
 
+type GetUserByUserIdRes = UserLoginRes
+
 type UserLoginRes struct {
 	model.User
 
-	RoleId      int64  `json:"role_id"`      // 角色 ID
-	AccessToken string `json:"access_token"` // 访问令牌
-	VisitToken  string `json:"visit_token"`  // 访问令牌
+	HavePassword bool   `json:"have_password"` // 是否有密码
+	RoleId       int64  `json:"role_id"`       // 角色 ID
+	AccessToken  string `json:"access_token"`  // 访问令牌
+	VisitToken   string `json:"visit_token"`   // 访问令牌
 }

@@ -80,6 +80,22 @@ func (mr *MockUserRepoMockRecorder) GetUserByEmail(c, email interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByEmail", reflect.TypeOf((*MockUserRepo)(nil).GetUserByEmail), c, email)
 }
 
+// GetUserById mocks base method.
+func (m *MockUserRepo) GetUserById(c context.Context, userId int64) (*model.User, bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserById", c, userId)
+	ret0, _ := ret[0].(*model.User)
+	ret1, _ := ret[1].(bool)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetUserById indicates an expected call of GetUserById.
+func (mr *MockUserRepoMockRecorder) GetUserById(c, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserById", reflect.TypeOf((*MockUserRepo)(nil).GetUserById), c, userId)
+}
+
 // GetUserByUsername mocks base method.
 func (m *MockUserRepo) GetUserByUsername(c context.Context, username string) (*model.User, bool, error) {
 	m.ctrl.T.Helper()

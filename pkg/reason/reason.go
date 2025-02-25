@@ -33,8 +33,14 @@ const (
 	// 邮箱域名不合法
 	EmailIllegalDomainError = "error.email.illegal_email_domain_error"
 
+	// 邮箱或密码错误
+	EmailOrPasswordWrong = "error.object.email_or_password_incorrect"
+
 	// 邮箱验证链接已过期
 	EmailVerifyURLExpired = "error.email.verify_url_expired"
+
+	// 不允许通过密码登录
+	NotAllowedLoginViaPassword = "error.user.not_allowed_login_via_password"
 
 	// 密码不允许包含空格
 	PasswordCannotContainSpaces = "error.password.space_invalid"

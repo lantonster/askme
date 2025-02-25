@@ -53,6 +53,71 @@ func (ctrl *UserController) SetVisitCookies(c *gin.Context, visitToken string, f
 	c.SetCookie(constant.CookieKeyUserVisitToken, visitToken, int(constant.CookieTimeUserVisitToken), "/", url.Host, true, true)
 }
 
+// LoginByEmail godoc
+//
+//	@Summary		通过邮箱登录
+//	@Description	通过邮箱登录
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		schema.LoginByEmailReq								true	"body"
+//	@Success		200		{object}	handler.ResponseBody{data=schema.LoginByEmailRes}	"success"
+//	@Router			/askme/api/v1/user/email/login [post]
+func (ctrl *UserController) LoginByEmail(c *gin.Context) {
+	req := &schema.LoginByEmailReq{}
+	if handler.BindAndCheck(c, req) {
+		return
+	}
+
+	res, err := ctrl.UserService().LoginByEmail(c, req)
+	ctrl.SetVisitCookies(c, res.VisitToken, true)
+	handler.Response(c, err, res)
+}
+
+// RegisterUserByEmail godoc
+//
+//	@Summary		通过邮箱注册账号
+//	@Description	通过邮箱注册账号
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		schema.RegisterUserByEmailReq								true	"body"
+//	@Success		200		{object}	handler.ResponseBody{data=schema.RegisterUserByEmailRes}	"success"
+//	@Router			/askme/api/v1/user/email/register [post]
+func (ctrl *UserController) RegisterUserByEmail(c *gin.Context) {
+	// 获取站点登录信息，如果获取失败则响应错误并返回
+	loginInfo, err := ctrl.SiteInfoService().GetSiteLogin(c)
+	if err != nil {
+		handler.Response(c, err, nil)
+		return
+	}
+	// 如果不允许新用户注册或不允许通过电子邮件注册
+	if !loginInfo.AllowNewRegistrations || !loginInfo.AllowEmailRegistrations {
+		handler.Response(c, errors.BadRequest(reason.UserRegistrationNotAllowed), nil)
+		return
+	}
+
+	req := &schema.RegisterUserByEmailReq{}
+	// 绑定并检查请求参数，如果绑定和检查出错则返回
+	if handler.BindAndCheck(c, req) {
+		return
+	}
+	// 如果登录信息不允许该邮箱注册
+	if !loginInfo.IsEmailAllowed(req.Email) {
+		handler.Response(c, errors.BadRequest(reason.EmailIllegalDomainError), nil)
+		return
+	}
+
+	req.IP = c.ClientIP()
+	// 调用用户服务进行注册，并根据结果进行响应
+	res, fieldErr, err := ctrl.UserService().RegisterUserByEmail(c, req)
+	if len(fieldErr) > 0 {
+		handler.Response(c, err, fieldErr)
+	} else {
+		handler.Response(c, err, res)
+	}
+}
+
 // VerifyEmail godoc
 //
 //	@Summary		邮箱验证
@@ -108,48 +173,4 @@ func (ctrl *UserController) CurrentUserInfo(c *gin.Context) {
 	// 设置访问 Cookie
 	ctrl.SetVisitCookies(c, user.VisitToken, false)
 	handler.Response(c, err, resp)
-}
-
-// RegisterUserByEmail godoc
-//
-//	@Summary		通过邮箱注册账号
-//	@Description	通过邮箱注册账号
-//	@Tags			User
-//	@Accept			json
-//	@Produce		json
-//	@Param			body	body		schema.RegisterUserByEmailReq								true	"body"
-//	@Success		200		{object}	handler.ResponseBody{data=schema.RegisterUserByEmailRes}	"success"
-//	@Router			/askme/api/v1/user/register/email [post]
-func (ctrl *UserController) RegisterUserByEmail(c *gin.Context) {
-	// 获取站点登录信息，如果获取失败则响应错误并返回
-	loginInfo, err := ctrl.SiteInfoService().GetSiteLogin(c)
-	if err != nil {
-		handler.Response(c, err, nil)
-		return
-	}
-	// 如果不允许新用户注册或不允许通过电子邮件注册
-	if !loginInfo.AllowNewRegistrations || !loginInfo.AllowEmailRegistrations {
-		handler.Response(c, errors.BadRequest(reason.UserRegistrationNotAllowed), nil)
-		return
-	}
-
-	req := &schema.RegisterUserByEmailReq{}
-	// 绑定并检查请求参数，如果绑定和检查出错则返回
-	if handler.BindAndCheck(c, req) {
-		return
-	}
-	// 如果登录信息不允许该邮箱注册
-	if !loginInfo.IsEmailAllowed(req.Email) {
-		handler.Response(c, errors.BadRequest(reason.EmailIllegalDomainError), nil)
-		return
-	}
-
-	req.IP = c.ClientIP()
-	// 调用用户服务进行注册，并根据结果进行响应
-	res, fieldErr, err := ctrl.UserService().RegisterUserByEmail(c, req)
-	if len(fieldErr) > 0 {
-		handler.Response(c, err, fieldErr)
-	} else {
-		handler.Response(c, err, res)
-	}
 }

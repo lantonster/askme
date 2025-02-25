@@ -51,6 +51,21 @@ func (mr *MockUserServiceMockRecorder) GetUserByUserId(c, userId interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByUserId", reflect.TypeOf((*MockUserService)(nil).GetUserByUserId), c, userId)
 }
 
+// LoginByEmail mocks base method.
+func (m *MockUserService) LoginByEmail(c context.Context, req *schema.LoginByEmailReq) (*schema.LoginByEmailRes, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoginByEmail", c, req)
+	ret0, _ := ret[0].(*schema.LoginByEmailRes)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LoginByEmail indicates an expected call of LoginByEmail.
+func (mr *MockUserServiceMockRecorder) LoginByEmail(c, req interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByEmail", reflect.TypeOf((*MockUserService)(nil).LoginByEmail), c, req)
+}
+
 // RegisterUserByEmail mocks base method.
 func (m *MockUserService) RegisterUserByEmail(c context.Context, req *schema.RegisterUserByEmailReq) (*schema.RegisterUserByEmailRes, []*validator.FieldError, error) {
 	m.ctrl.T.Helper()

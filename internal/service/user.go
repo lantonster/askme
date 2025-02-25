@@ -21,10 +21,13 @@ type UserService interface {
 	// GetUserByUserId 根据用户 ID 获取用户信息
 	GetUserByUserId(c context.Context, userId int64) (*schema.GetUserByUserIdRes, error)
 
-	// RegisterUserByEmail 通过邮箱注册账号
+	// LoginByEmail 邮箱登录
+	LoginByEmail(c context.Context, req *schema.LoginByEmailReq) (*schema.LoginByEmailRes, error)
+
+	// RegisterUserByEmail 邮箱注册
 	RegisterUserByEmail(c context.Context, req *schema.RegisterUserByEmailReq) (*schema.RegisterUserByEmailRes, []*validator.FieldError, error)
 
-	// VerifyEmail 验证电子邮件
+	// VerifyEmail 邮箱验证
 	VerifyEmail(c context.Context, req *schema.VerifyEmailReq) (*schema.VerifyEmailRes, error)
 }
 
@@ -64,6 +67,48 @@ func (s *UserServiceImpl) GetUserByUserId(c context.Context, userId int64) (*sch
 		User:         *user,
 		HavePassword: len(user.Password) > 0,
 	}, nil
+}
+
+func (s *UserServiceImpl) LoginByEmail(c context.Context, req *schema.LoginByEmailReq) (*schema.LoginByEmailRes, error) {
+	login, err := siteInfoService.GetSiteLogin(c)
+	if err != nil {
+		log.WithContext(c).Errorf("获取站点登录信息失败: %v", err)
+		return nil, err
+	}
+
+	if !login.AllowPasswordLogin {
+		return nil, errors.BadRequest(reason.NotAllowedLoginViaPassword)
+	}
+
+	user, exist, err := s.UserRepo.GetUserByEmail(c, req.Email)
+	if err != nil {
+		log.WithContext(c).Errorf("查询用户 [%s] 信息失败: %v", req.Email, err)
+		return nil, err
+	} else if !exist || user.Status == model.UserStatusDeleted {
+		log.WithContext(c).Errorf("用户 [%s] 不存在或已删除", req.Email)
+		return nil, errors.BadRequest(reason.EmailOrPasswordWrong)
+	}
+
+	// TODO external login
+
+	if err := s.UserRepo.UpdateLastLoginDate(c, user.Id); err != nil {
+		log.WithContext(c).Errorf("更新用户 [%d] 最后登录时间失败: %v", user.Id, err)
+		return nil, err
+	}
+
+	// TODO role id
+
+	res := &schema.LoginByEmailRes{User: *user, HavePassword: len(user.Password) > 0}
+	if res.AccessToken, res.VisitToken, err = authService.SetUserCacheInfo(c, user); err != nil {
+		log.WithContext(c).Errorf("生成用户相关 token 发生错误: %v", err)
+		return nil, err
+	}
+
+	if res.RoleId == model.RoleIdAdminID {
+		// TODO set admin chache
+	}
+
+	return res, nil
 }
 
 // RegisterUserByEmail 通过电子邮件注册用户。

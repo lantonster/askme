@@ -123,13 +123,13 @@ export const modifyAnswer = (params: Type.AnswerParams) => {
 
 export const login = (params: Type.LoginReqParams) => {
   return request.post<Type.UserInfoRes>(
-    '/answer/api/v1/user/login/email',
+    '/askme/api/v1/user/email/login',
     params,
   );
 };
 
 export const register = (params: Type.RegisterReqParams) => {
-  return request.post<any>('/askme/api/v1/user/register/email', params);
+  return request.post<any>('/askme/api/v1/user/email/register', params);
 };
 
 export const logout = () => {

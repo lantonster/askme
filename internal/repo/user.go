@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/lantonster/askme/internal/data"
 	"github.com/lantonster/askme/internal/model"
@@ -37,6 +38,9 @@ type UserRepo interface {
 
 	// UpdateEmailStatus 更新用户的邮箱状态
 	UpdateEmailStatus(c context.Context, userId int64, emailStatus string) error
+
+	// UpdateLastLoginDate 更新用户的最后登录日期
+	UpdateLastLoginDate(c context.Context, userId int64) error
 }
 
 type userRepo struct {
@@ -209,6 +213,15 @@ func (r *userRepo) IncrRank(c context.Context, userId, currentRank, deltaRank in
 // UpdateEmailStatus 更新用户的邮箱状态
 func (r *userRepo) UpdateEmailStatus(c context.Context, userId int64, emailStatus string) error {
 	_, err := orm.Q.User.WithContext(c).Where(orm.Q.User.Id.Eq(userId)).UpdateSimple(orm.Q.User.MailStatus.Value(emailStatus))
+	if err != nil {
+		return errors.InternalServer(reason.DatabaseError).WithError(err).WithStack()
+	}
+	return nil
+}
+
+// UpdateLastLoginDate 更新用户的最后登录时间
+func (r *userRepo) UpdateLastLoginDate(c context.Context, userId int64) error {
+	_, err := orm.Q.User.WithContext(c).Where(orm.Q.User.Id.Eq(userId)).UpdateSimple(orm.Q.User.LastLoginDate.Value(time.Now().Unix()))
 	if err != nil {
 		return errors.InternalServer(reason.DatabaseError).WithError(err).WithStack()
 	}

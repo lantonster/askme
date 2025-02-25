@@ -139,3 +139,17 @@ func (mr *MockUserRepoMockRecorder) UpdateEmailStatus(c, userId, emailStatus int
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEmailStatus", reflect.TypeOf((*MockUserRepo)(nil).UpdateEmailStatus), c, userId, emailStatus)
 }
+
+// UpdateLastLoginDate mocks base method.
+func (m *MockUserRepo) UpdateLastLoginDate(c context.Context, userId int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateLastLoginDate", c, userId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateLastLoginDate indicates an expected call of UpdateLastLoginDate.
+func (mr *MockUserRepoMockRecorder) UpdateLastLoginDate(c, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateLastLoginDate", reflect.TypeOf((*MockUserRepo)(nil).UpdateLastLoginDate), c, userId)
+}

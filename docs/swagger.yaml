@@ -211,6 +211,33 @@ definitions:
 info:
   contact: {}
 paths:
+  /askme/api/v1/user/email/register:
+    post:
+      consumes:
+      - application/json
+      description: 通过邮箱注册账号
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.RegisterUserByEmailReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.ResponseBody'
+            - properties:
+                data:
+                  $ref: '#/definitions/schema.RegisterUserByEmailRes'
+              type: object
+      summary: 通过邮箱注册账号
+      tags:
+      - User
   /askme/api/v1/user/email/verification:
     post:
       consumes:
@@ -256,33 +283,6 @@ paths:
                   $ref: '#/definitions/schema.GetUserByUserIdRes'
               type: object
       summary: 获取用户信息
-      tags:
-      - User
-  /askme/api/v1/user/register/email:
-    post:
-      consumes:
-      - application/json
-      description: 通过邮箱注册账号
-      parameters:
-      - description: body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/schema.RegisterUserByEmailReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: success
-          schema:
-            allOf:
-            - $ref: '#/definitions/handler.ResponseBody'
-            - properties:
-                data:
-                  $ref: '#/definitions/schema.RegisterUserByEmailRes'
-              type: object
-      summary: 通过邮箱注册账号
       tags:
       - User
 swagger: "2.0"

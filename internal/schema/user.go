@@ -6,6 +6,13 @@ import (
 	"github.com/lantonster/askme/pkg/validator"
 )
 
+type LoginByEmailReq struct {
+	Email string `validate:"required,email,gt=0,lte=500" json:"e_mail"`
+	Pass  string `validate:"required,gte=8,lte=32" json:"pass"`
+}
+
+type LoginByEmailRes = UserLoginRes
+
 type RegisterUserByEmailReq struct {
 	Name  string `validate:"required,gte=2,lte=30" json:"name"`          // 用户名
 	Email string `validate:"required,email,gt=0,lte=500" json:"e_mail" ` // 邮箱
